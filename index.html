@@ -50,11 +50,6 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .auth-msg.err{background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2);}
 .auth-msg.ok{background:rgba(0,212,160,.1);color:var(--accent);border:1px solid rgba(0,212,160,.2);}
 
-/* ── CONFIG BANNER ───────────────────────────────────── */
-#config-banner{background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.2);padding:10px 24px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--amber);}
-#config-banner input{background:var(--bg3);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:5px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:260px;outline:none;}
-#config-banner button{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:5px 12px;color:var(--amber);font-size:11px;cursor:pointer;}
-
 /* ── APP SHELL ────────────────────────────────────────── */
 #app{display:none;}
 .topnav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:var(--bg2);}
@@ -174,15 +169,6 @@ input:checked+.slider:before{transform:translateX(18px);background:var(--accent)
 </style>
 </head>
 <body>
-
-<!-- ── CONFIG BANNER (shown until Supabase keys are set) ── -->
-<div id="config-banner">
-  <span>⚙ Connect Supabase:</span>
-  <input type="text" id="sb-url" placeholder="https://xxxx.supabase.co"/>
-  <input type="text" id="sb-key" placeholder="anon key..." style="margin-left:8px;"/>
-  <button onclick="initSupabase()">Connect</button>
-  <span id="sb-status" style="margin-left:8px;"></span>
-</div>
 
 <!-- ── AUTH PAGE ─────────────────────────────────────── -->
 <div id="auth-page">
@@ -396,42 +382,18 @@ input:checked+.slider:before{transform:translateX(18px);background:var(--accent)
 <div class="toast" id="toast"></div>
 
 <script>
-let supabase = null;
+// ── SUPABASE CONFIG — replace with your project credentials ──
+const SUPABASE_URL  = 'https://ibpxmwowrviueeubiavc.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicHhtd293cnZpdWVldWJpYXZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTc1NTAsImV4cCI6MjA5NDE5MzU1MH0.Mwamj7enFCzdQO2uU9whk8r9K6NTdp8wlmUohcXh26o';
+// ─────────────────────────────────────────────────────────────
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUser = null;
 let equityChart = null;
-let allSignals = [];
+let allSignals  = [];
 let realtimeSub = null;
 
-// ── SUPABASE INIT ───────────────────────────────────────
-function initSupabase() {
-  const url = document.getElementById('sb-url').value.trim();
-  const key = document.getElementById('sb-key').value.trim();
-  if (!url || !key) { showToast('Enter both Supabase URL and anon key', 'err'); return; }
-
-  try {
-    supabase = window.supabase.createClient(url, key);
-    localStorage.setItem('sb_url', url);
-    localStorage.setItem('sb_key', key);
-    document.getElementById('sb-status').textContent = '✓ Connected';
-    document.getElementById('sb-status').style.color = 'var(--accent)';
-    document.getElementById('config-banner').style.background = 'rgba(0,212,160,0.05)';
-    showToast('Supabase connected', 'ok');
-    checkSession();
-  } catch(e) {
-    showToast('Connection failed: ' + e.message, 'err');
-  }
-}
-
-// Auto-load saved keys
-window.addEventListener('DOMContentLoaded', () => {
-  const url = localStorage.getItem('sb_url');
-  const key = localStorage.getItem('sb_key');
-  if (url && key) {
-    document.getElementById('sb-url').value = url;
-    document.getElementById('sb-key').value = key;
-    initSupabase();
-  }
-});
+window.addEventListener('DOMContentLoaded', () => checkSession());
 
 // ── AUTH ──────────────────────────────────────────────
 function switchTab(tab) {
@@ -441,13 +403,13 @@ function switchTab(tab) {
 }
 
 async function checkSession() {
-  if (!supabase) return;
+  
   const { data: { session } } = await supabase.auth.getSession();
   if (session) { currentUser = session.user; showApp(); }
 }
 
 async function doLogin() {
-  if (!supabase) { showToast('Connect Supabase first', 'err'); return; }
+  
   const email = document.getElementById('login-email').value;
   const pw    = document.getElementById('login-pw').value;
   const btn   = document.getElementById('login-btn');
@@ -460,7 +422,7 @@ async function doLogin() {
 }
 
 async function doSignup() {
-  if (!supabase) { showToast('Connect Supabase first', 'err'); return; }
+  
   const email = document.getElementById('signup-email').value;
   const pw    = document.getElementById('signup-pw').value;
   const btn   = document.getElementById('signup-btn');
@@ -472,7 +434,7 @@ async function doSignup() {
 }
 
 async function doLogout() {
-  if (supabase) await supabase.auth.signOut();
+  await supabase.auth.signOut();
   if (realtimeSub) supabase.removeChannel(realtimeSub);
   currentUser = null;
   document.getElementById('app').style.display = 'none';
@@ -499,7 +461,7 @@ function showPage(name) {
 
 // ── DASHBOARD ──────────────────────────────────────────
 async function loadDashboard() {
-  if (!supabase) return;
+  
   await Promise.all([loadMetrics(), loadEquityChart(), loadRecentTrades(), loadLiveSignals()]);
 }
 
@@ -645,7 +607,7 @@ function renderLiveSignals(signals) {
 
 // ── SIGNALS PAGE ───────────────────────────────────────
 async function loadSignals() {
-  if (!supabase) return;
+  
   const { data } = await supabase
     .from('signals')
     .select('*')
@@ -701,7 +663,7 @@ function renderSignalsTable(signals) {
 
 // ── TRADES PAGE ───────────────────────────────────────
 async function loadTrades() {
-  if (!supabase) return;
+  
   const { data } = await supabase
     .from('trades')
     .select('*')
@@ -752,7 +714,7 @@ function renderTradesTable(trades, full=false) {
 
 // ── SETTINGS ──────────────────────────────────────────
 async function loadSettings() {
-  if (!supabase || !currentUser) return;
+  
   const { data } = await supabase
     .from('settings')
     .select('*')
@@ -766,7 +728,7 @@ async function loadSettings() {
 }
 
 async function saveSettings() {
-  if (!supabase || !currentUser) { showToast('Connect Supabase first', 'err'); return; }
+  
   const settings = {
     user_id:         currentUser.id,
     risk_per_trade:  parseFloat(document.getElementById('set-risk').value) / 100,
@@ -784,7 +746,7 @@ async function saveSettings() {
 
 // ── REALTIME ──────────────────────────────────────────
 function subscribeRealtime() {
-  if (!supabase) return;
+  
   realtimeSub = supabase.channel('apex-live')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'signals' }, payload => {
       showToast(`📡 New ${payload.new.direction?.toUpperCase()} signal — ${payload.new.symbol} ${payload.new.timeframe}`, 'ok');
