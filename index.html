@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>APEX AI — Institutional Trading</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:        #07080A;
+  --bg2:       #0D0F12;
+  --bg3:       #131619;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.13);
+  --text:      #E8EAF0;
+  --muted:     #6B7280;
+  --accent:    #00D4A0;
+  --accent2:   #0092FF;
+  --red:       #FF4D4D;
+  --amber:     #F59E0B;
+  --mono:      'IBM Plex Mono', monospace;
+  --serif:     'Instrument Serif', serif;
+  --sans:      'DM Sans', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── SCAN LINE EFFECT ─────────────────────────────────── */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999;}
+
+/* ── AUTH PAGE ────────────────────────────────────────── */
+#auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:var(--bg);}
+.auth-wrap{width:100%;max-width:400px;}
+.auth-logo{font-family:var(--serif);font-size:42px;color:var(--accent);letter-spacing:-1px;margin-bottom:4px;}
+.auth-tagline{font-size:12px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:48px;font-family:var(--mono);}
+.auth-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:1px solid var(--border2);}
+.auth-tab{flex:1;padding:10px;font-size:13px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:var(--sans);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.auth-form{display:flex;flex-direction:column;gap:16px;}
+.field label{display:block;font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;font-family:var(--mono);}
+.field input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;transition:border .2s;}
+.field input:focus{border-color:var(--accent);}
+.btn-primary{background:var(--accent);color:#000;border:none;border-radius:6px;padding:13px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:opacity .2s;width:100%;}
+.btn-primary:hover{opacity:.85;}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
+.auth-msg{font-size:12px;padding:10px 14px;border-radius:6px;margin-top:4px;}
+.auth-msg.err{background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2);}
+.auth-msg.ok{background:rgba(0,212,160,.1);color:var(--accent);border:1px solid rgba(0,212,160,.2);}
+
+/* ── CONFIG BANNER ───────────────────────────────────── */
+#config-banner{background:rgba(245,158,11,.08);border-bottom:1px solid rgba(245,158,11,.2);padding:10px 24px;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--amber);}
+#config-banner input{background:var(--bg3);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:5px 10px;color:var(--text);font-size:12px;font-family:var(--mono);width:260px;outline:none;}
+#config-banner button{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:4px;padding:5px 12px;color:var(--amber);font-size:11px;cursor:pointer;}
+
+/* ── APP SHELL ────────────────────────────────────────── */
+#app{display:none;}
+.topnav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.nav-logo{font-family:var(--serif);font-size:22px;color:var(--accent);}
+.nav-right{display:flex;align-items:center;gap:20px;}
+.nav-link{font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--mono);letter-spacing:0.05em;transition:color .2s;background:none;border:none;}
+.nav-link:hover,.nav-link.active{color:var(--text);}
+.status-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-family:var(--mono);}
+.dot{width:6px;height:6px;border-radius:50%;}
+.dot.live{background:var(--accent);box-shadow:0 0 6px var(--accent);}
+.dot.off{background:var(--muted);}
+
+/* ── PAGES ───────────────────────────────────────────── */
+.page{display:none;padding:28px 24px;}
+.page.active{display:block;}
+
+/* ── GRID LAYOUTS ─────────────────────────────────────── */
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.main-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* ── CARDS ───────────────────────────────────────────── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;}
+.card-sm{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.card-title{font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-family:var(--mono);margin-bottom:14px;}
+
+/* ── METRIC CARD ─────────────────────────────────────── */
+.metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.metric-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px;}
+.metric-value{font-size:26px;font-weight:300;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-0.5px;}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:5px;font-family:var(--mono);}
+.metric-sub.up{color:var(--accent);}
+.metric-sub.dn{color:var(--red);}
+
+/* ── SIGNAL TABLE ─────────────────────────────────────── */
+.signal-table{width:100%;border-collapse:collapse;font-size:12px;}
+.signal-table th{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.signal-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.signal-table tr:last-child td{border-bottom:none;}
+.signal-table tr:hover td{background:rgba(255,255,255,0.02);}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:500;font-family:var(--mono);letter-spacing:0.05em;}
+.badge.buy{background:rgba(0,212,160,.12);color:var(--accent);border:1px solid rgba(0,212,160,.25);}
+.badge.sell{background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2);}
+.badge.pending{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.badge.closed{background:rgba(107,114,128,.12);color:var(--muted);border:1px solid rgba(107,114,128,.2);}
+.conf-bar-wrap{display:flex;align-items:center;gap:6px;}
+.conf-bar{width:60px;height:3px;background:var(--border2);border-radius:2px;overflow:hidden;}
+.conf-fill{height:100%;border-radius:2px;transition:width .5s;}
+.conf-fill.hi{background:var(--accent);}
+.conf-fill.md{background:var(--amber);}
+.conf-fill.lo{background:var(--red);}
+.tf-chip{font-size:10px;font-family:var(--mono);color:var(--muted);background:var(--bg3);padding:2px 7px;border-radius:3px;border:1px solid var(--border);}
+.mono{font-family:var(--mono);font-size:11px;}
+
+/* ── EQUITY CHART ────────────────────────────────────── */
+.chart-wrap{position:relative;height:220px;margin-top:8px;}
+
+/* ── SIGNAL PANEL ────────────────────────────────────── */
+.live-signal{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;}
+.live-signal:hover{border-color:var(--border2);}
+.live-signal.buy-border{border-left:3px solid var(--accent);}
+.live-signal.sell-border{border-left:3px solid var(--red);}
+.sig-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.sig-sym{font-family:var(--mono);font-size:13px;font-weight:500;}
+.sig-tf{font-family:var(--mono);font-size:10px;color:var(--muted);}
+.sig-levels{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px;}
+.sig-level{font-size:10px;color:var(--muted);font-family:var(--mono);}
+.sig-level span{display:block;color:var(--text);font-size:11px;}
+
+/* ── SETTINGS ────────────────────────────────────────── */
+.settings-section{margin-bottom:28px;}
+.settings-title{font-size:13px;font-weight:500;margin-bottom:16px;color:var(--text);}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-info{font-size:13px;}
+.setting-info small{display:block;font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono);}
+.toggle{position:relative;width:42px;height:24px;cursor:pointer;}
+.toggle input{opacity:0;width:0;height:0;}
+.slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border2);border-radius:24px;transition:.2s;}
+.slider:before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s;}
+input:checked+.slider{background:rgba(0,212,160,.2);border-color:var(--accent);}
+input:checked+.slider:before{transform:translateX(18px);background:var(--accent);}
+.setting-input{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--mono);width:100px;outline:none;}
+.setting-input:focus{border-color:var(--accent);}
+.btn-save{background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.25);border-radius:6px;padding:8px 20px;color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--sans);}
+.btn-danger{background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:6px;padding:8px 20px;color:var(--red);font-size:12px;cursor:pointer;font-family:var(--sans);}
+
+/* ── EMPTY STATE ────────────────────────────────────────── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty i{font-size:32px;opacity:.4;margin-bottom:12px;display:block;}
+.empty p{font-size:13px;}
+
+/* ── TOAST ───────────────────────────────────────────── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 18px;font-size:13px;color:var(--text);z-index:1000;transform:translateY(80px);opacity:0;transition:all .25s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{border-left:3px solid var(--accent);}
+.toast.err{border-left:3px solid var(--red);}
+
+/* ── LOADER ───────────────────────────────────────────── */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,212,160,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── SCROLLBAR ───────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:900px){
+  .metrics-grid{grid-template-columns:repeat(2,1fr);}
+  .main-grid{grid-template-columns:1fr;}
+  .two-col{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .metrics-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- ── CONFIG BANNER (shown until Supabase keys are set) ── -->
+<div id="config-banner">
+  <span>⚙ Connect Supabase:</span>
+  <input type="text" id="sb-url" placeholder="https://xxxx.supabase.co"/>
+  <input type="text" id="sb-key" placeholder="anon key..." style="margin-left:8px;"/>
+  <button onclick="initSupabase()">Connect</button>
+  <span id="sb-status" style="margin-left:8px;"></span>
+</div>
+
+<!-- ── AUTH PAGE ─────────────────────────────────────── -->
+<div id="auth-page">
+  <div class="auth-wrap">
+    <div class="auth-logo">APEX</div>
+    <div class="auth-tagline">AI Institutional Trading System</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Sign in</button>
+      <button class="auth-tab" onclick="switchTab('signup')">Create account</button>
+    </div>
+
+    <div id="login-form" class="auth-form">
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="trader@fund.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="login-pw" placeholder="••••••••"/></div>
+      <div id="login-msg"></div>
+      <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
+    </div>
+
+    <div id="signup-form" class="auth-form" style="display:none;">
+      <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="trader@fund.com"/></div>
+      <div class="field"><label>Password</label><input type="password" id="signup-pw" placeholder="min 6 characters"/></div>
+      <div id="signup-msg"></div>
+      <button class="btn-primary" id="signup-btn" onclick="doSignup()">Create account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ─────────────────────────────────────── -->
+<div id="app">
+  <nav class="topnav">
+    <div class="nav-logo">APEX AI</div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <button class="nav-link active" onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</button>
+      <button class="nav-link" onclick="showPage('signals')" id="nav-signals">Signals</button>
+      <button class="nav-link" onclick="showPage('trades')" id="nav-trades">Trades</button>
+      <button class="nav-link" onclick="showPage('settings')" id="nav-settings">Settings</button>
+    </div>
+    <div class="nav-right">
+      <div class="status-badge"><div class="dot live" id="conn-dot"></div><span id="conn-label" style="font-size:10px;">Live</span></div>
+      <button class="nav-link" onclick="doLogout()" style="color:var(--red);font-size:11px;">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- ── DASHBOARD ───────────────────────────────────── -->
+  <div class="page active" id="page-dashboard">
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-label">Account Equity</div>
+        <div class="metric-value" id="m-equity">—</div>
+        <div class="metric-sub up" id="m-equity-sub">Loading...</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Win Rate</div>
+        <div class="metric-value" id="m-winrate">—</div>
+        <div class="metric-sub" id="m-winrate-sub">last 30 trades</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Daily Drawdown</div>
+        <div class="metric-value" id="m-dd">—</div>
+        <div class="metric-sub" id="m-dd-sub">limit: 3.00%</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Open Trades</div>
+        <div class="metric-value" id="m-open">—</div>
+        <div class="metric-sub">max 5 simultaneous</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">Equity Curve</div>
+          <div class="chart-wrap"><canvas id="equity-chart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Recent Trades</div>
+          <div id="recent-trades-wrap">
+            <div class="empty"><p>Loading trades...</p></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">Live Signals</div>
+          <div id="live-signals-wrap">
+            <div class="empty"><p style="font-size:11px;font-family:var(--mono);">No active signals</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIGNALS PAGE ─────────────────────────────────── -->
+  <div class="page" id="page-signals">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div>
+        <div style="font-family:var(--serif);font-size:24px;color:var(--text);">Signal Feed</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px;">All detected setups — all instruments, all timeframes</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <select id="filter-sym" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;">
+          <option value="">All symbols</option>
+          <option>XAUUSD</option><option>NAS100</option><option>US30</option><option>XAGUSD</option><option>USOIL</option>
+        </select>
+        <select id="filter-tf" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;">
+          <option value="">All TFs</option>
+          <option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>D1</option>
+        </select>
+        <select id="filter-dir" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;">
+          <option value="">Buy & Sell</option><option value="buy">Buy only</option><option value="sell">Sell only</option>
+        </select>
+      </div>
+    </div>
+    <div class="card">
+      <div id="signals-table-wrap">
+        <div class="empty"><div class="spin"></div><p style="margin-top:12px;">Loading signals...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TRADES PAGE ─────────────────────────────────── -->
+  <div class="page" id="page-trades">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div>
+        <div style="font-family:var(--serif);font-size:24px;">Trade History</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px;">Every executed trade, outcome, and AI metadata</div>
+      </div>
+      <div id="trades-stats" style="display:flex;gap:16px;font-size:12px;font-family:var(--mono);"></div>
+    </div>
+    <div class="card">
+      <div id="trades-table-wrap">
+        <div class="empty"><div class="spin"></div><p style="margin-top:12px;">Loading trades...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SETTINGS PAGE ─────────────────────────────────── -->
+  <div class="page" id="page-settings">
+    <div style="max-width:600px;">
+      <div style="font-family:var(--serif);font-size:24px;margin-bottom:28px;">Settings</div>
+
+      <div class="settings-section">
+        <div class="settings-title">Risk Management</div>
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">Risk per trade<small>% of account balance</small></div>
+            <input class="setting-input" type="number" id="set-risk" value="1.0" step="0.1" min="0.1" max="5"/>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">Max daily drawdown<small>Halt trading when reached</small></div>
+            <input class="setting-input" type="number" id="set-dd" value="3.0" step="0.5" min="1"/>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">Max open trades<small>Simultaneous positions</small></div>
+            <input class="setting-input" type="number" id="set-max" value="5" step="1" min="1" max="20"/>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">AI confidence threshold<small>Min % to allow execution</small></div>
+            <input class="setting-input" type="number" id="set-ai" value="65" step="5" min="50" max="95"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Timeframes</div>
+        <div class="card">
+          <div class="setting-row"><div class="setting-info">M5 (5 minute)</div><label class="toggle"><input type="checkbox" id="tf-m5" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">M15 (15 minute)</div><label class="toggle"><input type="checkbox" id="tf-m15" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">M30 (30 minute)</div><label class="toggle"><input type="checkbox" id="tf-m30" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">H1 (1 hour)</div><label class="toggle"><input type="checkbox" id="tf-h1" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">H4 (4 hour)</div><label class="toggle"><input type="checkbox" id="tf-h4" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">D1 (daily)</div><label class="toggle"><input type="checkbox" id="tf-d1" checked/><span class="slider"></span></label></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Instruments</div>
+        <div class="card">
+          <div class="setting-row"><div class="setting-info">XAUUSD<small>Gold</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">NAS100<small>Nasdaq 100</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">US30<small>Dow Jones</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">XAGUSD<small>Silver</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">USOIL<small>Crude Oil</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-title">Session Filter</div>
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">24/7 — No session filter<small>Trade any hour, any day</small></div>
+            <label class="toggle"><input type="checkbox" id="tf-247" checked/><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">Avoid news events<small>CPI, NFP, FOMC blackout</small></div>
+            <label class="toggle"><input type="checkbox" id="tf-news" checked/><span class="slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;">
+        <button class="btn-save" onclick="saveSettings()">Save settings</button>
+        <button class="btn-danger" onclick="doLogout()">Sign out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ──────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<script>
+let supabase = null;
+let currentUser = null;
+let equityChart = null;
+let allSignals = [];
+let realtimeSub = null;
+
+// ── SUPABASE INIT ───────────────────────────────────────
+function initSupabase() {
+  const url = document.getElementById('sb-url').value.trim();
+  const key = document.getElementById('sb-key').value.trim();
+  if (!url || !key) { showToast('Enter both Supabase URL and anon key', 'err'); return; }
+
+  try {
+    supabase = window.supabase.createClient(url, key);
+    localStorage.setItem('sb_url', url);
+    localStorage.setItem('sb_key', key);
+    document.getElementById('sb-status').textContent = '✓ Connected';
+    document.getElementById('sb-status').style.color = 'var(--accent)';
+    document.getElementById('config-banner').style.background = 'rgba(0,212,160,0.05)';
+    showToast('Supabase connected', 'ok');
+    checkSession();
+  } catch(e) {
+    showToast('Connection failed: ' + e.message, 'err');
+  }
+}
+
+// Auto-load saved keys
+window.addEventListener('DOMContentLoaded', () => {
+  const url = localStorage.getItem('sb_url');
+  const key = localStorage.getItem('sb_key');
+  if (url && key) {
+    document.getElementById('sb-url').value = url;
+    document.getElementById('sb-key').value = key;
+    initSupabase();
+  }
+});
+
+// ── AUTH ──────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+  document.getElementById('login-form').style.display = tab === 'login' ? 'flex' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'flex' : 'none';
+}
+
+async function checkSession() {
+  if (!supabase) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) { currentUser = session.user; showApp(); }
+}
+
+async function doLogin() {
+  if (!supabase) { showToast('Connect Supabase first', 'err'); return; }
+  const email = document.getElementById('login-email').value;
+  const pw    = document.getElementById('login-pw').value;
+  const btn   = document.getElementById('login-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+  btn.disabled = false; btn.textContent = 'Sign in';
+  if (error) { document.getElementById('login-msg').innerHTML = `<div class="auth-msg err">${error.message}</div>`; return; }
+  currentUser = data.user;
+  showApp();
+}
+
+async function doSignup() {
+  if (!supabase) { showToast('Connect Supabase first', 'err'); return; }
+  const email = document.getElementById('signup-email').value;
+  const pw    = document.getElementById('signup-pw').value;
+  const btn   = document.getElementById('signup-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>';
+  const { error } = await supabase.auth.signUp({ email, password: pw });
+  btn.disabled = false; btn.textContent = 'Create account';
+  if (error) { document.getElementById('signup-msg').innerHTML = `<div class="auth-msg err">${error.message}</div>`; return; }
+  document.getElementById('signup-msg').innerHTML = `<div class="auth-msg ok">Account created — check your email to confirm.</div>`;
+}
+
+async function doLogout() {
+  if (supabase) await supabase.auth.signOut();
+  if (realtimeSub) supabase.removeChannel(realtimeSub);
+  currentUser = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('auth-page').style.display = 'flex';
+}
+
+// ── APP INIT ───────────────────────────────────────────
+function showApp() {
+  document.getElementById('auth-page').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadDashboard();
+  subscribeRealtime();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'signals') loadSignals();
+  if (name === 'trades')  loadTrades();
+  if (name === 'settings') loadSettings();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────
+async function loadDashboard() {
+  if (!supabase) return;
+  await Promise.all([loadMetrics(), loadEquityChart(), loadRecentTrades(), loadLiveSignals()]);
+}
+
+async function loadMetrics() {
+  // Account metrics from `account_snapshots` table
+  const { data } = await supabase
+    .from('account_snapshots')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (data) {
+    document.getElementById('m-equity').textContent = '$' + Number(data.equity).toLocaleString('en-US', {minimumFractionDigits:2});
+    const diff = data.equity - (data.day_start_equity || data.equity);
+    const sign = diff >= 0 ? '+' : '';
+    document.getElementById('m-equity-sub').textContent = sign + '$' + diff.toFixed(2) + ' today';
+    document.getElementById('m-equity-sub').className = 'metric-sub ' + (diff >= 0 ? 'up' : 'dn');
+    document.getElementById('m-dd').textContent = (data.daily_dd_pct * 100).toFixed(2) + '%';
+    document.getElementById('m-open').textContent = data.open_trades || '0';
+  } else {
+    // Demo data if table empty
+    document.getElementById('m-equity').textContent = '$10,000.00';
+    document.getElementById('m-equity-sub').textContent = 'No data yet';
+    document.getElementById('m-dd').textContent = '0.00%';
+    document.getElementById('m-open').textContent = '0';
+  }
+
+  // Win rate from trades
+  const { data: trades } = await supabase
+    .from('trades')
+    .select('won')
+    .order('closed_at', { ascending: false })
+    .limit(30);
+
+  if (trades && trades.length > 0) {
+    const wins = trades.filter(t => t.won).length;
+    document.getElementById('m-winrate').textContent = ((wins/trades.length)*100).toFixed(1) + '%';
+    document.getElementById('m-winrate-sub').textContent = `${trades.length} trades sampled`;
+  } else {
+    document.getElementById('m-winrate').textContent = '—';
+  }
+}
+
+async function loadEquityChart() {
+  const { data } = await supabase
+    .from('account_snapshots')
+    .select('equity, created_at')
+    .order('created_at', { ascending: true })
+    .limit(60);
+
+  const labels  = data ? data.map(d => new Date(d.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})) : [];
+  const values  = data ? data.map(d => d.equity) : [];
+
+  const ctx = document.getElementById('equity-chart').getContext('2d');
+  if (equityChart) equityChart.destroy();
+  equityChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels.length ? labels : ['Start'],
+      datasets: [{
+        data: values.length ? values : [10000],
+        borderColor: '#00D4A0',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: true,
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 220);
+          g.addColorStop(0, 'rgba(0,212,160,0.15)');
+          g.addColorStop(1, 'rgba(0,212,160,0)');
+          return g;
+        },
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: {
+        backgroundColor: '#131619', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+        titleColor: '#6B7280', bodyColor: '#E8EAF0', titleFont: { family: 'IBM Plex Mono', size: 10 },
+        bodyFont: { family: 'IBM Plex Mono', size: 11 },
+        callbacks: { label: ctx => '$' + ctx.raw.toLocaleString('en-US', {minimumFractionDigits:2}) }
+      }},
+      scales: {
+        x: { ticks: { color: '#6B7280', font: { size: 10, family: 'IBM Plex Mono' }, maxTicksLimit: 8 }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#6B7280', font: { size: 10, family: 'IBM Plex Mono' }, callback: v => '$'+v.toLocaleString() }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      }
+    }
+  });
+}
+
+async function loadRecentTrades() {
+  const { data } = await supabase
+    .from('trades')
+    .select('*')
+    .order('opened_at', { ascending: false })
+    .limit(5);
+
+  const wrap = document.getElementById('recent-trades-wrap');
+  if (!data || data.length === 0) {
+    wrap.innerHTML = `<div class="empty"><p style="font-family:var(--mono);font-size:12px;">No trades yet</p></div>`; return;
+  }
+  wrap.innerHTML = renderTradesTable(data);
+}
+
+async function loadLiveSignals() {
+  const { data } = await supabase
+    .from('signals')
+    .select('*')
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(6);
+
+  renderLiveSignals(data || []);
+}
+
+function renderLiveSignals(signals) {
+  const wrap = document.getElementById('live-signals-wrap');
+  if (!signals.length) {
+    wrap.innerHTML = `<div class="empty"><p style="font-size:11px;font-family:var(--mono);">No active signals</p></div>`; return;
+  }
+  wrap.innerHTML = signals.map(s => `
+    <div class="live-signal ${s.direction === 'buy' ? 'buy-border' : 'sell-border'}">
+      <div class="sig-header">
+        <span class="sig-sym">${s.symbol}</span>
+        <span class="badge ${s.direction}">${s.direction.toUpperCase()}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="tf-chip">${s.timeframe || 'H1'}</span>
+        <div class="conf-bar-wrap">
+          <div class="conf-bar"><div class="conf-fill ${s.ai_confidence > 0.75 ? 'hi' : s.ai_confidence > 0.6 ? 'md' : 'lo'}" style="width:${(s.ai_confidence||0)*100}%"></div></div>
+          <span style="font-size:10px;font-family:var(--mono);color:var(--muted)">${Math.round((s.ai_confidence||0)*100)}%</span>
+        </div>
+      </div>
+      <div class="sig-levels">
+        <div class="sig-level">Entry<span class="mono">${s.entry_price?.toFixed(2) || '—'}</span></div>
+        <div class="sig-level">SL<span class="mono" style="color:var(--red)">${s.sl?.toFixed(2) || '—'}</span></div>
+        <div class="sig-level">TP<span class="mono" style="color:var(--accent)">${s.tp?.toFixed(2) || '—'}</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SIGNALS PAGE ───────────────────────────────────────
+async function loadSignals() {
+  if (!supabase) return;
+  const { data } = await supabase
+    .from('signals')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  allSignals = data || [];
+  renderSignalsTable(allSignals);
+}
+
+function filterSignals() {
+  const sym = document.getElementById('filter-sym').value;
+  const tf  = document.getElementById('filter-tf').value;
+  const dir = document.getElementById('filter-dir').value;
+  let filtered = allSignals;
+  if (sym) filtered = filtered.filter(s => s.symbol === sym);
+  if (tf)  filtered = filtered.filter(s => s.timeframe === tf);
+  if (dir) filtered = filtered.filter(s => s.direction === dir);
+  renderSignalsTable(filtered);
+}
+
+function renderSignalsTable(signals) {
+  const wrap = document.getElementById('signals-table-wrap');
+  if (!signals.length) {
+    wrap.innerHTML = `<div class="empty"><p style="font-family:var(--mono)">No signals found</p></div>`; return;
+  }
+  wrap.innerHTML = `
+    <table class="signal-table">
+      <thead><tr>
+        <th>Symbol</th><th>TF</th><th>Dir</th><th>Entry</th><th>SL</th><th>TP</th><th>RR</th><th>AI Conf</th><th>Patterns</th><th>Status</th><th>Time</th>
+      </tr></thead>
+      <tbody>${signals.map(s => `
+        <tr>
+          <td style="font-family:var(--mono);font-weight:500">${s.symbol}</td>
+          <td><span class="tf-chip">${s.timeframe||'H1'}</span></td>
+          <td><span class="badge ${s.direction}">${s.direction?.toUpperCase()}</span></td>
+          <td class="mono">${s.entry_price?.toFixed(2)||'—'}</td>
+          <td class="mono" style="color:var(--red)">${s.sl?.toFixed(2)||'—'}</td>
+          <td class="mono" style="color:var(--accent)">${s.tp?.toFixed(2)||'—'}</td>
+          <td class="mono">${s.rr ? s.rr.toFixed(2)+'R' : '—'}</td>
+          <td>
+            <div class="conf-bar-wrap">
+              <div class="conf-bar"><div class="conf-fill ${(s.ai_confidence||0)>0.75?'hi':(s.ai_confidence||0)>0.6?'md':'lo'}" style="width:${(s.ai_confidence||0)*100}%"></div></div>
+              <span class="mono">${Math.round((s.ai_confidence||0)*100)}%</span>
+            </div>
+          </td>
+          <td style="font-size:10px;color:var(--muted);font-family:var(--mono);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(s.patterns||[]).slice(0,2).join(', ')||'—'}</td>
+          <td><span class="badge ${s.status||'pending'}">${s.status||'pending'}</span></td>
+          <td class="mono" style="color:var(--muted)">${timeAgo(s.created_at)}</td>
+        </tr>
+      `).join('')}</tbody>
+    </table>`;
+}
+
+// ── TRADES PAGE ───────────────────────────────────────
+async function loadTrades() {
+  if (!supabase) return;
+  const { data } = await supabase
+    .from('trades')
+    .select('*')
+    .order('opened_at', { ascending: false })
+    .limit(100);
+
+  const wrap = document.getElementById('trades-table-wrap');
+  if (!data || !data.length) {
+    wrap.innerHTML = `<div class="empty"><p style="font-family:var(--mono)">No trades recorded yet</p></div>`; return;
+  }
+
+  // Stats bar
+  const wins = data.filter(t => t.won).length;
+  const totalPnl = data.reduce((a,t) => a + (t.pnl || 0), 0);
+  document.getElementById('trades-stats').innerHTML = `
+    <span style="color:var(--muted)">Total: <span style="color:var(--text)">${data.length}</span></span>
+    <span style="color:var(--muted)">WR: <span style="color:var(--accent)">${((wins/data.length)*100).toFixed(1)}%</span></span>
+    <span style="color:var(--muted)">PnL: <span style="color:${totalPnl>=0?'var(--accent)':'var(--red)'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(2)}</span></span>
+  `;
+  wrap.innerHTML = renderTradesTable(data, true);
+}
+
+function renderTradesTable(trades, full=false) {
+  return `
+    <table class="signal-table">
+      <thead><tr>
+        <th>Symbol</th><th>Dir</th>${full?'<th>TF</th>':''}<th>Entry</th><th>Exit</th><th>SL</th><th>TP</th><th>Lot</th><th>PnL</th><th>RR</th>${full?'<th>AI</th>':''}<th>Result</th><th>Opened</th>
+      </tr></thead>
+      <tbody>${trades.map(t => `
+        <tr>
+          <td style="font-family:var(--mono);font-weight:500">${t.symbol}</td>
+          <td><span class="badge ${t.direction}">${t.direction?.toUpperCase()}</span></td>
+          ${full?`<td><span class="tf-chip">${t.timeframe||'H1'}</span></td>`:''}
+          <td class="mono">${t.entry_price?.toFixed(5)||'—'}</td>
+          <td class="mono">${t.exit_price?.toFixed(5)||'<span style="color:var(--amber)">Open</span>'}</td>
+          <td class="mono" style="color:var(--red)">${t.sl?.toFixed(5)||'—'}</td>
+          <td class="mono" style="color:var(--accent)">${t.tp?.toFixed(5)||'—'}</td>
+          <td class="mono">${t.lot||'—'}</td>
+          <td class="mono" style="color:${(t.pnl||0)>=0?'var(--accent)':'var(--red)'}">${t.pnl!=null?((t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2)):'—'}</td>
+          <td class="mono">${t.rr_achieved?.toFixed(2)||'—'}</td>
+          ${full?`<td><span class="mono" style="font-size:10px">${t.ai_confidence?Math.round(t.ai_confidence*100)+'%':'—'}</span></td>`:''}
+          <td>${t.exit_price ? `<span class="badge ${t.won?'buy':'sell'}">${t.won?'WIN':'LOSS'}</span>` : '<span class="badge pending">OPEN</span>'}</td>
+          <td class="mono" style="color:var(--muted)">${timeAgo(t.opened_at)}</td>
+        </tr>
+      `).join('')}</tbody>
+    </table>`;
+}
+
+// ── SETTINGS ──────────────────────────────────────────
+async function loadSettings() {
+  if (!supabase || !currentUser) return;
+  const { data } = await supabase
+    .from('settings')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
+  if (!data) return;
+  if (data.risk_per_trade)  document.getElementById('set-risk').value = (data.risk_per_trade*100).toFixed(1);
+  if (data.max_daily_dd)    document.getElementById('set-dd').value   = (data.max_daily_dd*100).toFixed(1);
+  if (data.max_open_trades) document.getElementById('set-max').value  = data.max_open_trades;
+  if (data.ai_threshold)    document.getElementById('set-ai').value   = Math.round(data.ai_threshold*100);
+}
+
+async function saveSettings() {
+  if (!supabase || !currentUser) { showToast('Connect Supabase first', 'err'); return; }
+  const settings = {
+    user_id:         currentUser.id,
+    risk_per_trade:  parseFloat(document.getElementById('set-risk').value) / 100,
+    max_daily_dd:    parseFloat(document.getElementById('set-dd').value) / 100,
+    max_open_trades: parseInt(document.getElementById('set-max').value),
+    ai_threshold:    parseInt(document.getElementById('set-ai').value) / 100,
+    session_247:     document.getElementById('tf-247').checked,
+    avoid_news:      document.getElementById('tf-news').checked,
+    updated_at:      new Date().toISOString(),
+  };
+  const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'user_id' });
+  if (error) { showToast('Save failed: ' + error.message, 'err'); return; }
+  showToast('Settings saved', 'ok');
+}
+
+// ── REALTIME ──────────────────────────────────────────
+function subscribeRealtime() {
+  if (!supabase) return;
+  realtimeSub = supabase.channel('apex-live')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'signals' }, payload => {
+      showToast(`📡 New ${payload.new.direction?.toUpperCase()} signal — ${payload.new.symbol} ${payload.new.timeframe}`, 'ok');
+      loadLiveSignals();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trades' }, payload => {
+      showToast(`✅ Trade executed — ${payload.new.direction?.toUpperCase()} ${payload.new.symbol}`, 'ok');
+      loadMetrics();
+      loadRecentTrades();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'trades' }, payload => {
+      if (payload.new.exit_price) {
+        const won = payload.new.won;
+        showToast(`${won ? '🏆 WIN' : '📉 LOSS'} — ${payload.new.symbol} ${won ? '+' : ''}$${payload.new.pnl?.toFixed(2)}`, won ? 'ok' : 'err');
+        loadMetrics(); loadRecentTrades();
+      }
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'account_snapshots' }, payload => {
+      loadMetrics();
+    })
+    .subscribe(status => {
+      const live = status === 'SUBSCRIBED';
+      document.getElementById('conn-dot').className = 'dot ' + (live ? 'live' : 'off');
+      document.getElementById('conn-label').textContent = live ? 'Live' : 'Connecting...';
+    });
+}
+
+// ── UTILS ──────────────────────────────────────────────
+function timeAgo(iso) {
+  if (!iso) return '—';
+  const d = Math.floor((Date.now() - new Date(iso)) / 1000);
+  if (d < 60) return d + 's ago';
+  if (d < 3600) return Math.floor(d/60) + 'm ago';
+  if (d < 86400) return Math.floor(d/3600) + 'h ago';
+  return Math.floor(d/86400) + 'd ago';
+}
+
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Poll metrics every 30s
+setInterval(() => {
+  if (currentUser) loadMetrics();
+}, 30000);
+</script>
+</body>
+</html>
