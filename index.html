@@ -4,56 +4,35 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>APEX AI — Institutional Trading</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg:        #07080A;
-  --bg2:       #0D0F12;
-  --bg3:       #131619;
-  --border:    rgba(255,255,255,0.07);
-  --border2:   rgba(255,255,255,0.13);
-  --text:      #E8EAF0;
-  --muted:     #6B7280;
-  --accent:    #00D4A0;
-  --accent2:   #0092FF;
-  --red:       #FF4D4D;
-  --amber:     #F59E0B;
-  --mono:      'IBM Plex Mono', monospace;
-  --serif:     'Instrument Serif', serif;
-  --sans:      'DM Sans', sans-serif;
-}
+:root{--bg:#07080A;--bg2:#0D0F12;--bg3:#131619;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#E8EAF0;--muted:#6B7280;--accent:#00D4A0;--red:#FF4D4D;--amber:#F59E0B;--mono:'IBM Plex Mono',monospace;--serif:'Instrument Serif',serif;--sans:'DM Sans',sans-serif;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999;}
-
-/* ── AUTH ── */
-#auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:var(--bg);}
+#auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
 .auth-wrap{width:100%;max-width:400px;}
 .auth-logo{font-family:var(--serif);font-size:42px;color:var(--accent);letter-spacing:-1px;margin-bottom:4px;}
 .auth-tagline{font-size:12px;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:48px;font-family:var(--mono);}
-.auth-tabs{display:flex;gap:0;margin-bottom:32px;border-bottom:1px solid var(--border2);}
-.auth-tab{flex:1;padding:10px;font-size:13px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:var(--sans);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.auth-tabs{display:flex;margin-bottom:32px;border-bottom:1px solid var(--border2);}
+.auth-tab{flex:1;padding:10px;font-size:13px;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .2s;}
 .auth-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 .auth-form{display:flex;flex-direction:column;gap:16px;}
 .field label{display:block;font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;font-family:var(--mono);}
 .field input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:12px 14px;color:var(--text);font-size:14px;font-family:var(--sans);outline:none;transition:border .2s;}
 .field input:focus{border-color:var(--accent);}
-.btn-primary{background:var(--accent);color:#000;border:none;border-radius:6px;padding:13px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:opacity .2s;width:100%;}
-.btn-primary:hover{opacity:.85;}
-.btn-primary:disabled{opacity:.4;cursor:not-allowed;}
-.auth-msg{font-size:12px;padding:10px 14px;border-radius:6px;margin-top:4px;}
+.btn-primary{background:var(--accent);color:#000;border:none;border-radius:6px;padding:13px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:opacity .2s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:hover:not(:disabled){opacity:.85;}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+.auth-msg{font-size:12px;padding:10px 14px;border-radius:6px;}
 .auth-msg.err{background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2);}
 .auth-msg.ok{background:rgba(0,212,160,.1);color:var(--accent);border:1px solid rgba(0,212,160,.2);}
-
-/* ── APP ── */
 #app{display:none;}
 .topnav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:var(--bg2);}
 .nav-logo{font-family:var(--serif);font-size:22px;color:var(--accent);}
-.nav-right{display:flex;align-items:center;gap:20px;}
-.nav-link{font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--mono);letter-spacing:0.05em;transition:color .2s;background:none;border:none;}
+.nav-link{font-size:12px;color:var(--muted);cursor:pointer;font-family:var(--mono);transition:color .2s;background:none;border:none;padding:4px 8px;}
 .nav-link:hover,.nav-link.active{color:var(--text);}
 .status-badge{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);font-family:var(--mono);}
 .dot{width:6px;height:6px;border-radius:50%;}
@@ -63,46 +42,42 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .page.active{display:block;}
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
 .main-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px;}
 .card-title{font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;font-family:var(--mono);margin-bottom:14px;}
 .metric{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
 .metric-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px;}
-.metric-value{font-size:26px;font-weight:300;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-0.5px;}
+.metric-value{font-size:26px;font-weight:300;font-variant-numeric:tabular-nums;}
 .metric-sub{font-size:11px;color:var(--muted);margin-top:5px;font-family:var(--mono);}
 .metric-sub.up{color:var(--accent);}
 .metric-sub.dn{color:var(--red);}
 .signal-table{width:100%;border-collapse:collapse;font-size:12px;}
 .signal-table th{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
-.signal-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.signal-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
 .signal-table tr:last-child td{border-bottom:none;}
 .signal-table tr:hover td{background:rgba(255,255,255,0.02);}
-.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:500;font-family:var(--mono);letter-spacing:0.05em;}
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:500;font-family:var(--mono);}
 .badge.buy{background:rgba(0,212,160,.12);color:var(--accent);border:1px solid rgba(0,212,160,.25);}
 .badge.sell{background:rgba(255,77,77,.1);color:var(--red);border:1px solid rgba(255,77,77,.2);}
 .badge.pending{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
-.badge.closed{background:rgba(107,114,128,.12);color:var(--muted);border:1px solid rgba(107,114,128,.2);}
 .conf-bar-wrap{display:flex;align-items:center;gap:6px;}
 .conf-bar{width:60px;height:3px;background:var(--border2);border-radius:2px;overflow:hidden;}
-.conf-fill{height:100%;border-radius:2px;transition:width .5s;}
+.conf-fill{height:100%;border-radius:2px;}
 .conf-fill.hi{background:var(--accent);}
 .conf-fill.md{background:var(--amber);}
 .conf-fill.lo{background:var(--red);}
 .tf-chip{font-size:10px;font-family:var(--mono);color:var(--muted);background:var(--bg3);padding:2px 7px;border-radius:3px;border:1px solid var(--border);}
 .mono{font-family:var(--mono);font-size:11px;}
 .chart-wrap{position:relative;height:220px;margin-top:8px;}
-.live-signal{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;}
-.live-signal:hover{border-color:var(--border2);}
+.live-signal{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
 .live-signal.buy-border{border-left:3px solid var(--accent);}
 .live-signal.sell-border{border-left:3px solid var(--red);}
 .sig-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
 .sig-sym{font-family:var(--mono);font-size:13px;font-weight:500;}
-.sig-tf{font-family:var(--mono);font-size:10px;color:var(--muted);}
 .sig-levels{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px;}
 .sig-level{font-size:10px;color:var(--muted);font-family:var(--mono);}
 .sig-level span{display:block;color:var(--text);font-size:11px;}
 .settings-section{margin-bottom:28px;}
-.settings-title{font-size:13px;font-weight:500;margin-bottom:16px;color:var(--text);}
+.settings-title{font-size:13px;font-weight:500;margin-bottom:16px;}
 .setting-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
 .setting-row:last-child{border-bottom:none;}
 .setting-info{font-size:13px;}
@@ -110,31 +85,27 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .toggle{position:relative;width:42px;height:24px;cursor:pointer;}
 .toggle input{opacity:0;width:0;height:0;}
 .slider{position:absolute;inset:0;background:var(--bg3);border:1px solid var(--border2);border-radius:24px;transition:.2s;}
-.slider:before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s;}
+.slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.2s;}
 input:checked+.slider{background:rgba(0,212,160,.2);border-color:var(--accent);}
-input:checked+.slider:before{transform:translateX(18px);background:var(--accent);}
+input:checked+.slider::before{transform:translateX(18px);background:var(--accent);}
 .setting-input{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:7px 12px;color:var(--text);font-size:13px;font-family:var(--mono);width:100px;outline:none;}
 .setting-input:focus{border-color:var(--accent);}
-.btn-save{background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.25);border-radius:6px;padding:8px 20px;color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--sans);}
-.btn-danger{background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:6px;padding:8px 20px;color:var(--red);font-size:12px;cursor:pointer;font-family:var(--sans);}
+.btn-save{background:rgba(0,212,160,.1);border:1px solid rgba(0,212,160,.25);border-radius:6px;padding:8px 20px;color:var(--accent);font-size:12px;cursor:pointer;}
+.btn-danger{background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:6px;padding:8px 20px;color:var(--red);font-size:12px;cursor:pointer;}
 .empty{text-align:center;padding:40px 20px;color:var(--muted);}
 .empty p{font-size:13px;}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 18px;font-size:13px;color:var(--text);z-index:10000;transform:translateY(80px);opacity:0;transition:all .25s;max-width:320px;}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.ok{border-left:3px solid var(--accent);}
 .toast.err{border-left:3px solid var(--red);}
-.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,212,160,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-@media(max-width:900px){.metrics-grid{grid-template-columns:repeat(2,1fr);}.main-grid{grid-template-columns:1fr;}.two-col{grid-template-columns:1fr;}}
-@media(max-width:600px){.metrics-grid{grid-template-columns:repeat(2,1fr);}}
+::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+@media(max-width:900px){.metrics-grid{grid-template-columns:repeat(2,1fr);}.main-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- ── AUTH ── -->
 <div id="auth-page">
   <div class="auth-wrap">
     <div class="auth-logo">APEX</div>
@@ -144,21 +115,20 @@ input:checked+.slider:before{transform:translateX(18px);background:var(--accent)
       <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Create account</button>
     </div>
     <div id="login-form" class="auth-form">
-      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="trader@fund.com"/></div>
-      <div class="field"><label>Password</label><input type="password" id="login-pw" placeholder="••••••••"/></div>
+      <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="trader@fund.com" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="field"><label>Password</label><input type="password" id="login-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
       <div id="login-msg"></div>
       <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
     </div>
-    <div id="signup-form" class="auth-form" style="display:none;">
-      <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="trader@fund.com"/></div>
-      <div class="field"><label>Password</label><input type="password" id="signup-pw" placeholder="min 6 characters"/></div>
+    <div id="signup-form" class="auth-form" style="display:none">
+      <div class="field"><label>Email</label><input type="email" id="signup-email" placeholder="trader@fund.com" onkeydown="if(event.key==='Enter')doSignup()"/></div>
+      <div class="field"><label>Password</label><input type="password" id="signup-pw" placeholder="min 6 characters" onkeydown="if(event.key==='Enter')doSignup()"/></div>
       <div id="signup-msg"></div>
       <button class="btn-primary" id="signup-btn" onclick="doSignup()">Create account</button>
     </div>
   </div>
 </div>
 
-<!-- ── APP ── -->
 <div id="app">
   <nav class="topnav">
     <div class="nav-logo">APEX AI</div>
@@ -168,57 +138,52 @@ input:checked+.slider:before{transform:translateX(18px);background:var(--accent)
       <button class="nav-link" onclick="showPage('trades')" id="nav-trades">Trades</button>
       <button class="nav-link" onclick="showPage('settings')" id="nav-settings">Settings</button>
     </div>
-    <div class="nav-right">
-      <div class="status-badge"><div class="dot live" id="conn-dot"></div><span id="conn-label" style="font-size:10px;">Live</span></div>
-      <button class="nav-link" onclick="doLogout()" style="color:var(--red);font-size:11px;">Sign out</button>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div class="status-badge"><div class="dot live" id="conn-dot"></div><span id="conn-label" style="font-size:10px">Live</span></div>
+      <button class="nav-link" onclick="doLogout()" style="color:var(--red);font-size:11px">Sign out</button>
     </div>
   </nav>
 
-  <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
     <div class="metrics-grid">
-      <div class="metric"><div class="metric-label">Account Equity</div><div class="metric-value" id="m-equity">—</div><div class="metric-sub up" id="m-equity-sub">Loading...</div></div>
+      <div class="metric"><div class="metric-label">Account Equity</div><div class="metric-value" id="m-equity">—</div><div class="metric-sub up" id="m-equity-sub">—</div></div>
       <div class="metric"><div class="metric-label">Win Rate</div><div class="metric-value" id="m-winrate">—</div><div class="metric-sub" id="m-winrate-sub">last 30 trades</div></div>
-      <div class="metric"><div class="metric-label">Daily Drawdown</div><div class="metric-value" id="m-dd">—</div><div class="metric-sub" id="m-dd-sub">limit: 3.00%</div></div>
+      <div class="metric"><div class="metric-label">Daily Drawdown</div><div class="metric-value" id="m-dd">—</div><div class="metric-sub">limit: 3.00%</div></div>
       <div class="metric"><div class="metric-label">Open Trades</div><div class="metric-value" id="m-open">—</div><div class="metric-sub">max 5 simultaneous</div></div>
     </div>
     <div class="main-grid">
       <div>
-        <div class="card" style="margin-bottom:16px;"><div class="card-title">Equity Curve</div><div class="chart-wrap"><canvas id="equity-chart"></canvas></div></div>
-        <div class="card"><div class="card-title">Recent Trades</div><div id="recent-trades-wrap"><div class="empty"><p>Loading trades...</p></div></div></div>
+        <div class="card" style="margin-bottom:16px"><div class="card-title">Equity Curve</div><div class="chart-wrap"><canvas id="equity-chart"></canvas></div></div>
+        <div class="card"><div class="card-title">Recent Trades</div><div id="recent-trades-wrap"><div class="empty"><p>No trades yet</p></div></div></div>
       </div>
       <div>
-        <div class="card"><div class="card-title">Live Signals</div><div id="live-signals-wrap"><div class="empty"><p style="font-size:11px;font-family:var(--mono);">No active signals</p></div></div></div>
+        <div class="card"><div class="card-title">Live Signals</div><div id="live-signals-wrap"><div class="empty"><p style="font-size:11px;font-family:var(--mono)">No active signals</p></div></div></div>
       </div>
     </div>
   </div>
 
-  <!-- SIGNALS -->
   <div class="page" id="page-signals">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <div><div style="font-family:var(--serif);font-size:24px;color:var(--text);">Signal Feed</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px;">All detected setups</div></div>
-      <div style="display:flex;gap:8px;">
-        <select id="filter-sym" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;"><option value="">All symbols</option><option>XAUUSD</option><option>NAS100</option><option>US30</option><option>XAGUSD</option><option>USOIL</option></select>
-        <select id="filter-tf" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;"><option value="">All TFs</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option>H4</option><option>D1</option></select>
-        <select id="filter-dir" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none;"><option value="">Buy & Sell</option><option value="buy">Buy only</option><option value="sell">Sell only</option></select>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><div style="font-family:var(--serif);font-size:24px">Signal Feed</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px">All detected setups</div></div>
+      <div style="display:flex;gap:8px">
+        <select id="filter-sym" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none"><option value="">All symbols</option><option>XAUUSD</option><option>NAS100</option><option>US30</option><option>XAGUSD</option><option>USOIL</option></select>
+        <select id="filter-dir" onchange="filterSignals()" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:var(--mono);outline:none"><option value="">Buy & Sell</option><option value="buy">Buy only</option><option value="sell">Sell only</option></select>
       </div>
     </div>
-    <div class="card"><div id="signals-table-wrap"><div class="empty"><div class="spin"></div><p style="margin-top:12px;">Loading signals...</p></div></div></div>
+    <div class="card"><div id="signals-table-wrap"><div class="empty"><p>Loading...</p></div></div></div>
   </div>
 
-  <!-- TRADES -->
   <div class="page" id="page-trades">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-      <div><div style="font-family:var(--serif);font-size:24px;">Trade History</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px;">Every executed trade, outcome, and AI metadata</div></div>
-      <div id="trades-stats" style="display:flex;gap:16px;font-size:12px;font-family:var(--mono);"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div><div style="font-family:var(--serif);font-size:24px">Trade History</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px">Every executed trade and AI metadata</div></div>
+      <div id="trades-stats" style="display:flex;gap:16px;font-size:12px;font-family:var(--mono)"></div>
     </div>
-    <div class="card"><div id="trades-table-wrap"><div class="empty"><div class="spin"></div><p style="margin-top:12px;">Loading trades...</p></div></div></div>
+    <div class="card"><div id="trades-table-wrap"><div class="empty"><p>Loading...</p></div></div></div>
   </div>
 
-  <!-- SETTINGS -->
   <div class="page" id="page-settings">
-    <div style="max-width:600px;">
-      <div style="font-family:var(--serif);font-size:24px;margin-bottom:28px;">Settings</div>
+    <div style="max-width:600px">
+      <div style="font-family:var(--serif);font-size:24px;margin-bottom:28px">Settings</div>
       <div class="settings-section">
         <div class="settings-title">Risk Management</div>
         <div class="card">
@@ -231,32 +196,22 @@ input:checked+.slider:before{transform:translateX(18px);background:var(--accent)
       <div class="settings-section">
         <div class="settings-title">Timeframes</div>
         <div class="card">
-          <div class="setting-row"><div class="setting-info">M5</div><label class="toggle"><input type="checkbox" id="tf-m5" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">M15</div><label class="toggle"><input type="checkbox" id="tf-m15" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">M30</div><label class="toggle"><input type="checkbox" id="tf-m30" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">H1</div><label class="toggle"><input type="checkbox" id="tf-h1" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">H4</div><label class="toggle"><input type="checkbox" id="tf-h4" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">D1</div><label class="toggle"><input type="checkbox" id="tf-d1" checked/><span class="slider"></span></label></div>
-        </div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-title">Instruments</div>
-        <div class="card">
-          <div class="setting-row"><div class="setting-info">XAUUSD<small>Gold</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">NAS100<small>Nasdaq 100</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">US30<small>Dow Jones</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">XAGUSD<small>Silver</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
-          <div class="setting-row"><div class="setting-info">USOIL<small>Crude Oil</small></div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">M5</div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">M15</div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">M30</div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">H1</div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">H4</div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">D1</div><label class="toggle"><input type="checkbox" checked/><span class="slider"></span></label></div>
         </div>
       </div>
       <div class="settings-section">
         <div class="settings-title">Session Filter</div>
         <div class="card">
-          <div class="setting-row"><div class="setting-info">24/7 — No session filter<small>Trade any hour, any day</small></div><label class="toggle"><input type="checkbox" id="tf-247" checked/><span class="slider"></span></label></div>
+          <div class="setting-row"><div class="setting-info">24/7 — No session filter<small>Trade any hour</small></div><label class="toggle"><input type="checkbox" id="tf-247" checked/><span class="slider"></span></label></div>
           <div class="setting-row"><div class="setting-info">Avoid news events<small>CPI, NFP, FOMC blackout</small></div><label class="toggle"><input type="checkbox" id="tf-news" checked/><span class="slider"></span></label></div>
         </div>
       </div>
-      <div style="display:flex;gap:12px;">
+      <div style="display:flex;gap:12px">
         <button class="btn-save" onclick="saveSettings()">Save settings</button>
         <button class="btn-danger" onclick="doLogout()">Sign out</button>
       </div>
@@ -267,246 +222,208 @@ input:checked+.slider:before{transform:translateX(18px);background:var(--accent)
 <div class="toast" id="toast"></div>
 
 <script>
-// ── ALL CODE RUNS AFTER DOM + SCRIPTS ARE READY ──────────────────
-const SUPABASE_URL  = 'https://ibpxmwowrviueeubiavc.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicHhtd293cnZpdWVldWJpYXZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTc1NTAsImV4cCI6MjA5NDE5MzU1MH0.Mwamj7enFCzdQO2uU9whk8r9K6NTdp8wlmUohcXh26o';
+// ── CONFIG ────────────────────────────────────────────────────────
+const SB_URL = 'https://ibpxmwowrviueeubiavc.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicHhtd293cnZpdWVldWJpYXZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTc1NTAsImV4cCI6MjA5NDE5MzU1MH0.Mwamj7enFCzdQO2uU9whk8r9K6NTdp8wlmUohcXh26o';
 
-let supabase = null;
-let currentUser = null;
+// ── STATE — no SDK, pure fetch ───────────────────────────────────
+let _token = null;
+let _user  = null;
 let equityChart = null;
 let allSignals  = [];
-let realtimeSub = null;
 
-// ── INIT: runs only after the full page (including CDN scripts) has loaded ──
-window.addEventListener('load', () => {
-  // Safety check — if CDN failed to load, show a clear error instead of silent breakage
-  if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-    document.getElementById('login-msg').innerHTML =
-      `<div class="auth-msg err">⚠️ Failed to load Supabase SDK. Check your internet connection and reload.</div>`;
-    document.getElementById('login-btn').disabled = true;
-    document.getElementById('signup-btn').disabled = true;
-    return;
-  }
-
-  // ✅ Safe to initialize now
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  checkSession();
-  setInterval(() => { if (currentUser) loadMetrics(); }, 30000);
-});
-
-// ── HELPERS ──────────────────────────────────────────────────────
-function setMsg(id, text, type) {
-  document.getElementById(id).innerHTML =
-    text ? `<div class="auth-msg ${type}">${text}</div>` : '';
+// Supabase Auth (no SDK needed)
+async function sbAuth(path, body) {
+  const r = await fetch(`${SB_URL}/auth/v1${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
+    body: JSON.stringify(body)
+  });
+  return r.json();
 }
 
-function setBtnLoading(btnId, loading, label) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  btn.innerHTML = loading ? '<span class="spin"></span>' : label;
+// Supabase REST query
+async function sbGet(table, qs = '') {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${qs}`, {
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${_token}`, 'Accept': 'application/json' }
+  });
+  if (!r.ok) return [];
+  return r.json();
+}
+
+// Supabase upsert
+async function sbUpsert(table, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${_token}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+    body: JSON.stringify(body)
+  });
+  return r.ok;
+}
+
+// Session persistence
+function saveSession(token, user) {
+  _token = token; _user = user;
+  try { localStorage.setItem('apex_t', token); localStorage.setItem('apex_u', JSON.stringify(user)); } catch(e){}
+}
+function restoreSession() {
+  try {
+    const t = localStorage.getItem('apex_t');
+    const u = JSON.parse(localStorage.getItem('apex_u') || 'null');
+    if (t && u) { _token = t; _user = u; return true; }
+  } catch(e){}
+  return false;
 }
 
 // ── AUTH ─────────────────────────────────────────────────────────
-function switchTab(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-  document.getElementById('login-form').style.display  = tab === 'login'  ? 'flex' : 'none';
-  document.getElementById('signup-form').style.display = tab === 'signup' ? 'flex' : 'none';
+function switchTab(t) {
+  document.getElementById('tab-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-signup').classList.toggle('active', t==='signup');
+  document.getElementById('login-form').style.display  = t==='login'  ? 'flex':'none';
+  document.getElementById('signup-form').style.display = t==='signup' ? 'flex':'none';
 }
 
-async function checkSession() {
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) { currentUser = session.user; showApp(); }
-  } catch(e) {
-    console.error('Session check failed:', e);
-  }
+function msg(id, text, type) {
+  document.getElementById(id).innerHTML = text ? `<div class="auth-msg ${type}">${text}</div>` : '';
+}
+
+function busy(id, on, label) {
+  const b = document.getElementById(id);
+  b.disabled = on;
+  b.innerHTML = on ? '<span class="spin"></span>' : label;
 }
 
 async function doLogin() {
-  if (!supabase) return;
-
   const email = document.getElementById('login-email').value.trim();
   const pw    = document.getElementById('login-pw').value;
-
-  if (!email || !pw) {
-    setMsg('login-msg', 'Please enter your email and password.', 'err');
-    return;
-  }
-
-  setMsg('login-msg', '', '');
-  setBtnLoading('login-btn', true, 'Sign in');
-
+  if (!email || !pw) { msg('login-msg','Enter your email and password.','err'); return; }
+  msg('login-msg','','');
+  busy('login-btn', true, 'Sign in');
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
-    if (error) {
-      setMsg('login-msg', error.message, 'err');
-    } else {
-      currentUser = data.user;
+    const res = await sbAuth('/token?grant_type=password', { email, password: pw });
+    if (res.access_token) {
+      saveSession(res.access_token, res.user);
       showApp();
+    } else {
+      msg('login-msg', res.error_description || res.message || res.error || 'Login failed.', 'err');
     }
   } catch(e) {
-    setMsg('login-msg', 'Network error — please try again.', 'err');
-    console.error('Login error:', e);
-  } finally {
-    setBtnLoading('login-btn', false, 'Sign in');
+    msg('login-msg', 'Network error — check your connection.', 'err');
   }
+  busy('login-btn', false, 'Sign in');
 }
 
 async function doSignup() {
-  if (!supabase) return;
-
   const email = document.getElementById('signup-email').value.trim();
   const pw    = document.getElementById('signup-pw').value;
-
-  if (!email || !pw) {
-    setMsg('signup-msg', 'Please enter your email and password.', 'err');
-    return;
-  }
-  if (pw.length < 6) {
-    setMsg('signup-msg', 'Password must be at least 6 characters.', 'err');
-    return;
-  }
-
-  setMsg('signup-msg', '', '');
-  setBtnLoading('signup-btn', true, 'Create account');
-
+  if (!email || !pw) { msg('signup-msg','Enter your email and password.','err'); return; }
+  if (pw.length < 6) { msg('signup-msg','Password must be at least 6 characters.','err'); return; }
+  msg('signup-msg','','');
+  busy('signup-btn', true, 'Create account');
   try {
-    const { error } = await supabase.auth.signUp({ email, password: pw });
-    if (error) {
-      setMsg('signup-msg', error.message, 'err');
+    const res = await sbAuth('/signup', { email, password: pw });
+    if (res.error || res.error_description) {
+      msg('signup-msg', res.error_description || res.error, 'err');
     } else {
-      setMsg('signup-msg', '✅ Account created — check your email to confirm.', 'ok');
+      msg('signup-msg', '✅ Account created! Check your email to confirm, then sign in.', 'ok');
     }
   } catch(e) {
-    setMsg('signup-msg', 'Network error — please try again.', 'err');
-    console.error('Signup error:', e);
-  } finally {
-    setBtnLoading('signup-btn', false, 'Create account');
+    msg('signup-msg', 'Network error — check your connection.', 'err');
   }
+  busy('signup-btn', false, 'Create account');
 }
 
-async function doLogout() {
-  try {
-    await supabase.auth.signOut();
-    if (realtimeSub) supabase.removeChannel(realtimeSub);
-  } catch(e) { console.error('Logout error:', e); }
-  currentUser = null;
+function doLogout() {
+  _token = null; _user = null;
+  try { localStorage.removeItem('apex_t'); localStorage.removeItem('apex_u'); } catch(e){}
   document.getElementById('app').style.display = 'none';
   document.getElementById('auth-page').style.display = 'flex';
 }
 
-// Also allow pressing Enter in password fields
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  document.getElementById('signup-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doSignup(); });
-});
-
-// ── APP INIT ─────────────────────────────────────────────────────
+// ── APP ──────────────────────────────────────────────────────────
 function showApp() {
   document.getElementById('auth-page').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   loadDashboard();
-  subscribeRealtime();
 }
 
 function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
-  if (name === 'signals')  loadSignals();
-  if (name === 'trades')   loadTrades();
-  if (name === 'settings') loadSettings();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='signals') loadSignals();
+  if(name==='trades')  loadTrades();
+  if(name==='settings') loadSettingsPage();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────────
-async function loadDashboard() {
-  await Promise.all([loadMetrics(), loadEquityChart(), loadRecentTrades(), loadLiveSignals()]);
+function loadDashboard() {
+  loadMetrics(); loadEquityChart(); loadRecentTrades(); loadLiveSignals();
 }
 
 async function loadMetrics() {
   try {
-    const { data } = await supabase.from('account_snapshots').select('*').order('created_at', { ascending: false }).limit(1).maybeSingle();
-    if (data) {
-      document.getElementById('m-equity').textContent = '$' + Number(data.equity).toLocaleString('en-US', {minimumFractionDigits:2});
-      const diff = data.equity - (data.day_start_equity || data.equity);
-      document.getElementById('m-equity-sub').textContent = (diff >= 0 ? '+' : '') + '$' + diff.toFixed(2) + ' today';
-      document.getElementById('m-equity-sub').className = 'metric-sub ' + (diff >= 0 ? 'up' : 'dn');
-      document.getElementById('m-dd').textContent = (data.daily_dd_pct * 100).toFixed(2) + '%';
-      document.getElementById('m-open').textContent = data.open_trades || '0';
+    const snaps = await sbGet('account_snapshots','order=created_at.desc&limit=1');
+    const snap = snaps && snaps[0];
+    if (snap) {
+      document.getElementById('m-equity').textContent = '$'+Number(snap.equity).toLocaleString('en-US',{minimumFractionDigits:2});
+      const diff = snap.equity - (snap.day_start_equity||snap.equity);
+      document.getElementById('m-equity-sub').textContent = (diff>=0?'+':'')+'$'+diff.toFixed(2)+' today';
+      document.getElementById('m-equity-sub').className = 'metric-sub '+(diff>=0?'up':'dn');
+      document.getElementById('m-dd').textContent = ((snap.daily_dd_pct||0)*100).toFixed(2)+'%';
+      document.getElementById('m-open').textContent = snap.open_trades||'0';
     } else {
       document.getElementById('m-equity').textContent = '$10,000.00';
       document.getElementById('m-equity-sub').textContent = 'No data yet';
       document.getElementById('m-dd').textContent = '0.00%';
       document.getElementById('m-open').textContent = '0';
     }
-    const { data: trades } = await supabase.from('trades').select('won').order('closed_at', { ascending: false }).limit(30);
-    if (trades && trades.length > 0) {
-      const wins = trades.filter(t => t.won).length;
-      document.getElementById('m-winrate').textContent = ((wins / trades.length) * 100).toFixed(1) + '%';
-      document.getElementById('m-winrate-sub').textContent = `${trades.length} trades sampled`;
-    } else {
-      document.getElementById('m-winrate').textContent = '—';
-    }
-  } catch(e) { console.error('Metrics error:', e); }
+    const trades = await sbGet('trades','select=won&order=closed_at.desc&limit=30');
+    if (trades && trades.length) {
+      const wins = trades.filter(t=>t.won).length;
+      document.getElementById('m-winrate').textContent = ((wins/trades.length)*100).toFixed(1)+'%';
+      document.getElementById('m-winrate-sub').textContent = trades.length+' trades sampled';
+    } else { document.getElementById('m-winrate').textContent = '—'; }
+  } catch(e){ console.error('Metrics:',e); }
 }
 
 async function loadEquityChart() {
-  try {
-    const { data } = await supabase.from('account_snapshots').select('equity, created_at').order('created_at', { ascending: true }).limit(60);
-    const labels = data ? data.map(d => new Date(d.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric'})) : [];
-    const values = data ? data.map(d => d.equity) : [];
-    const ctx = document.getElementById('equity-chart').getContext('2d');
-    if (equityChart) equityChart.destroy();
-    equityChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels.length ? labels : ['Start'],
-        datasets: [{ data: values.length ? values : [10000], borderColor: '#00D4A0', borderWidth: 1.5, pointRadius: 0, fill: true,
-          backgroundColor: (ctx) => { const g = ctx.chart.ctx.createLinearGradient(0,0,0,220); g.addColorStop(0,'rgba(0,212,160,0.15)'); g.addColorStop(1,'rgba(0,212,160,0)'); return g; },
-          tension: 0.4 }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { backgroundColor:'#131619', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, titleColor:'#6B7280', bodyColor:'#E8EAF0', titleFont:{family:'IBM Plex Mono',size:10}, bodyFont:{family:'IBM Plex Mono',size:11}, callbacks: { label: ctx => '$' + ctx.raw.toLocaleString('en-US', {minimumFractionDigits:2}) } } },
-        scales: {
-          x: { ticks:{color:'#6B7280',font:{size:10,family:'IBM Plex Mono'},maxTicksLimit:8}, grid:{color:'rgba(255,255,255,0.04)'} },
-          y: { ticks:{color:'#6B7280',font:{size:10,family:'IBM Plex Mono'},callback:v=>'$'+v.toLocaleString()}, grid:{color:'rgba(255,255,255,0.04)'} }
-        }
-      }
-    });
-  } catch(e) { console.error('Chart error:', e); }
+  const data = await sbGet('account_snapshots','select=equity,created_at&order=created_at.asc&limit=60');
+  const labels = data.map(d=>new Date(d.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}));
+  const values = data.map(d=>d.equity);
+  const ctx = document.getElementById('equity-chart').getContext('2d');
+  if (equityChart) equityChart.destroy();
+  equityChart = new Chart(ctx, {
+    type:'line',
+    data:{ labels: labels.length?labels:['Start'], datasets:[{ data:values.length?values:[10000], borderColor:'#00D4A0', borderWidth:1.5, pointRadius:0, fill:true,
+      backgroundColor:ctx=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,'rgba(0,212,160,0.15)');g.addColorStop(1,'rgba(0,212,160,0)');return g;}, tension:0.4 }]},
+    options:{ responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#131619', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, titleColor:'#6B7280', bodyColor:'#E8EAF0',
+        titleFont:{family:'IBM Plex Mono',size:10}, bodyFont:{family:'IBM Plex Mono',size:11}, callbacks:{label:c=>'$'+c.raw.toLocaleString('en-US',{minimumFractionDigits:2})} }},
+      scales:{ x:{ticks:{color:'#6B7280',font:{size:10,family:'IBM Plex Mono'},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.04)'}},
+               y:{ticks:{color:'#6B7280',font:{size:10,family:'IBM Plex Mono'},callback:v=>'$'+v.toLocaleString()},grid:{color:'rgba(255,255,255,0.04)'}} }}
+  });
 }
 
 async function loadRecentTrades() {
-  try {
-    const { data } = await supabase.from('trades').select('*').order('opened_at', { ascending: false }).limit(5);
-    const wrap = document.getElementById('recent-trades-wrap');
-    if (!data || data.length === 0) { wrap.innerHTML = `<div class="empty"><p style="font-family:var(--mono);font-size:12px;">No trades yet</p></div>`; return; }
-    wrap.innerHTML = renderTradesTable(data);
-  } catch(e) { console.error('Recent trades error:', e); }
+  const data = await sbGet('trades','order=opened_at.desc&limit=5');
+  const wrap = document.getElementById('recent-trades-wrap');
+  if (!data.length){wrap.innerHTML=`<div class="empty"><p style="font-family:var(--mono);font-size:12px">No trades yet</p></div>`;return;}
+  wrap.innerHTML = renderTradesTable(data);
 }
 
 async function loadLiveSignals() {
-  try {
-    const { data } = await supabase.from('signals').select('*').eq('status', 'active').order('created_at', { ascending: false }).limit(6);
-    renderLiveSignals(data || []);
-  } catch(e) { console.error('Live signals error:', e); }
-}
-
-function renderLiveSignals(signals) {
+  const data = await sbGet('signals','status=eq.active&order=created_at.desc&limit=6');
   const wrap = document.getElementById('live-signals-wrap');
-  if (!signals.length) { wrap.innerHTML = `<div class="empty"><p style="font-size:11px;font-family:var(--mono);">No active signals</p></div>`; return; }
-  wrap.innerHTML = signals.map(s => `
-    <div class="live-signal ${s.direction === 'buy' ? 'buy-border' : 'sell-border'}">
+  if (!data.length){wrap.innerHTML=`<div class="empty"><p style="font-size:11px;font-family:var(--mono)">No active signals</p></div>`;return;}
+  wrap.innerHTML = data.map(s=>`
+    <div class="live-signal ${s.direction==='buy'?'buy-border':'sell-border'}">
       <div class="sig-header"><span class="sig-sym">${s.symbol}</span><span class="badge ${s.direction}">${s.direction.toUpperCase()}</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span class="tf-chip">${s.timeframe || 'H1'}</span>
-        <div class="conf-bar-wrap">
-          <div class="conf-bar"><div class="conf-fill ${s.ai_confidence > 0.75 ? 'hi' : s.ai_confidence > 0.6 ? 'md' : 'lo'}" style="width:${(s.ai_confidence||0)*100}%"></div></div>
-          <span style="font-size:10px;font-family:var(--mono);color:var(--muted)">${Math.round((s.ai_confidence||0)*100)}%</span>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="tf-chip">${s.timeframe||'H1'}</span>
+        <div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill ${(s.ai_confidence||0)>.75?'hi':(s.ai_confidence||0)>.6?'md':'lo'}" style="width:${(s.ai_confidence||0)*100}%"></div></div>
+        <span style="font-size:10px;font-family:var(--mono);color:var(--muted)">${Math.round((s.ai_confidence||0)*100)}%</span></div>
       </div>
       <div class="sig-levels">
         <div class="sig-level">Entry<span class="mono">${s.entry_price?.toFixed(2)||'—'}</span></div>
@@ -516,154 +433,82 @@ function renderLiveSignals(signals) {
     </div>`).join('');
 }
 
-// ── SIGNALS PAGE ─────────────────────────────────────────────────
+// ── SIGNALS ──────────────────────────────────────────────────────
 async function loadSignals() {
-  try {
-    const { data } = await supabase.from('signals').select('*').order('created_at', { ascending: false }).limit(100);
-    allSignals = data || [];
-    renderSignalsTable(allSignals);
-  } catch(e) { console.error('Signals error:', e); }
+  const data = await sbGet('signals','order=created_at.desc&limit=100');
+  allSignals = data; renderSignalsTable(data);
 }
-
 function filterSignals() {
   const sym = document.getElementById('filter-sym').value;
-  const tf  = document.getElementById('filter-tf').value;
   const dir = document.getElementById('filter-dir').value;
-  let f = allSignals;
-  if (sym) f = f.filter(s => s.symbol === sym);
-  if (tf)  f = f.filter(s => s.timeframe === tf);
-  if (dir) f = f.filter(s => s.direction === dir);
-  renderSignalsTable(f);
+  renderSignalsTable(allSignals.filter(s=>(!sym||s.symbol===sym)&&(!dir||s.direction===dir)));
 }
-
-function renderSignalsTable(signals) {
+function renderSignalsTable(s) {
   const wrap = document.getElementById('signals-table-wrap');
-  if (!signals.length) { wrap.innerHTML = `<div class="empty"><p style="font-family:var(--mono)">No signals found</p></div>`; return; }
-  wrap.innerHTML = `<table class="signal-table"><thead><tr><th>Symbol</th><th>TF</th><th>Dir</th><th>Entry</th><th>SL</th><th>TP</th><th>RR</th><th>AI Conf</th><th>Patterns</th><th>Status</th><th>Time</th></tr></thead><tbody>
-    ${signals.map(s => `<tr>
-      <td style="font-family:var(--mono);font-weight:500">${s.symbol}</td>
-      <td><span class="tf-chip">${s.timeframe||'H1'}</span></td>
-      <td><span class="badge ${s.direction}">${s.direction?.toUpperCase()}</span></td>
-      <td class="mono">${s.entry_price?.toFixed(2)||'—'}</td>
-      <td class="mono" style="color:var(--red)">${s.sl?.toFixed(2)||'—'}</td>
-      <td class="mono" style="color:var(--accent)">${s.tp?.toFixed(2)||'—'}</td>
-      <td class="mono">${s.rr ? s.rr.toFixed(2)+'R' : '—'}</td>
-      <td><div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill ${(s.ai_confidence||0)>0.75?'hi':(s.ai_confidence||0)>0.6?'md':'lo'}" style="width:${(s.ai_confidence||0)*100}%"></div></div><span class="mono">${Math.round((s.ai_confidence||0)*100)}%</span></div></td>
-      <td style="font-size:10px;color:var(--muted);font-family:var(--mono);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${(s.patterns||[]).slice(0,2).join(', ')||'—'}</td>
-      <td><span class="badge ${s.status||'pending'}">${s.status||'pending'}</span></td>
-      <td class="mono" style="color:var(--muted)">${timeAgo(s.created_at)}</td>
-    </tr>`).join('')}</tbody></table>`;
+  if (!s.length){wrap.innerHTML=`<div class="empty"><p style="font-family:var(--mono)">No signals found</p></div>`;return;}
+  wrap.innerHTML=`<table class="signal-table"><thead><tr><th>Symbol</th><th>TF</th><th>Dir</th><th>Entry</th><th>SL</th><th>TP</th><th>AI Conf</th><th>Status</th><th>Time</th></tr></thead><tbody>
+  ${s.map(x=>`<tr><td style="font-family:var(--mono);font-weight:500">${x.symbol}</td><td><span class="tf-chip">${x.timeframe||'H1'}</span></td><td><span class="badge ${x.direction}">${x.direction?.toUpperCase()}</span></td><td class="mono">${x.entry_price?.toFixed(2)||'—'}</td><td class="mono" style="color:var(--red)">${x.sl?.toFixed(2)||'—'}</td><td class="mono" style="color:var(--accent)">${x.tp?.toFixed(2)||'—'}</td>
+  <td><div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill ${(x.ai_confidence||0)>.75?'hi':(x.ai_confidence||0)>.6?'md':'lo'}" style="width:${(x.ai_confidence||0)*100}%"></div></div><span class="mono">${Math.round((x.ai_confidence||0)*100)}%</span></div></td>
+  <td><span class="badge ${x.status||'pending'}">${x.status||'pending'}</span></td><td class="mono" style="color:var(--muted)">${timeAgo(x.created_at)}</td></tr>`).join('')}</tbody></table>`;
 }
 
-// ── TRADES PAGE ──────────────────────────────────────────────────
+// ── TRADES ───────────────────────────────────────────────────────
 async function loadTrades() {
-  try {
-    const { data } = await supabase.from('trades').select('*').order('opened_at', { ascending: false }).limit(100);
-    const wrap = document.getElementById('trades-table-wrap');
-    if (!data || !data.length) { wrap.innerHTML = `<div class="empty"><p style="font-family:var(--mono)">No trades recorded yet</p></div>`; return; }
-    const wins = data.filter(t => t.won).length;
-    const totalPnl = data.reduce((a,t) => a + (t.pnl || 0), 0);
-    document.getElementById('trades-stats').innerHTML = `
-      <span style="color:var(--muted)">Total: <span style="color:var(--text)">${data.length}</span></span>
-      <span style="color:var(--muted)">WR: <span style="color:var(--accent)">${((wins/data.length)*100).toFixed(1)}%</span></span>
-      <span style="color:var(--muted)">PnL: <span style="color:${totalPnl>=0?'var(--accent)':'var(--red)'}">${totalPnl>=0?'+':''}$${totalPnl.toFixed(2)}</span></span>`;
-    wrap.innerHTML = renderTradesTable(data, true);
-  } catch(e) { console.error('Trades error:', e); }
+  const data = await sbGet('trades','order=opened_at.desc&limit=100');
+  const wrap = document.getElementById('trades-table-wrap');
+  if (!data.length){wrap.innerHTML=`<div class="empty"><p style="font-family:var(--mono)">No trades yet</p></div>`;return;}
+  const wins=data.filter(t=>t.won).length, pnl=data.reduce((a,t)=>a+(t.pnl||0),0);
+  document.getElementById('trades-stats').innerHTML=`<span style="color:var(--muted)">Total: <span style="color:var(--text)">${data.length}</span></span><span style="color:var(--muted)">WR: <span style="color:var(--accent)">${((wins/data.length)*100).toFixed(1)}%</span></span><span style="color:var(--muted)">PnL: <span style="color:${pnl>=0?'var(--accent)':'var(--red)'}">${pnl>=0?'+':''}$${pnl.toFixed(2)}</span></span>`;
+  wrap.innerHTML = renderTradesTable(data, true);
 }
 
 function renderTradesTable(trades, full=false) {
-  return `<table class="signal-table"><thead><tr><th>Symbol</th><th>Dir</th>${full?'<th>TF</th>':''}<th>Entry</th><th>Exit</th><th>SL</th><th>TP</th><th>Lot</th><th>PnL</th><th>RR</th>${full?'<th>AI</th>':''}<th>Result</th><th>Opened</th></tr></thead><tbody>
-    ${trades.map(t => `<tr>
-      <td style="font-family:var(--mono);font-weight:500">${t.symbol}</td>
-      <td><span class="badge ${t.direction}">${t.direction?.toUpperCase()}</span></td>
-      ${full?`<td><span class="tf-chip">${t.timeframe||'H1'}</span></td>`:''}
-      <td class="mono">${t.entry_price?.toFixed(5)||'—'}</td>
-      <td class="mono">${t.exit_price?.toFixed(5)||'<span style="color:var(--amber)">Open</span>'}</td>
-      <td class="mono" style="color:var(--red)">${t.sl?.toFixed(5)||'—'}</td>
-      <td class="mono" style="color:var(--accent)">${t.tp?.toFixed(5)||'—'}</td>
-      <td class="mono">${t.lot||'—'}</td>
-      <td class="mono" style="color:${(t.pnl||0)>=0?'var(--accent)':'var(--red)'}">${t.pnl!=null?((t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2)):'—'}</td>
-      <td class="mono">${t.rr_achieved?.toFixed(2)||'—'}</td>
-      ${full?`<td><span class="mono" style="font-size:10px">${t.ai_confidence?Math.round(t.ai_confidence*100)+'%':'—'}</span></td>`:''}
-      <td>${t.exit_price ? `<span class="badge ${t.won?'buy':'sell'}">${t.won?'WIN':'LOSS'}</span>` : '<span class="badge pending">OPEN</span>'}</td>
-      <td class="mono" style="color:var(--muted)">${timeAgo(t.opened_at)}</td>
-    </tr>`).join('')}</tbody></table>`;
+  return`<table class="signal-table"><thead><tr><th>Symbol</th><th>Dir</th>${full?'<th>TF</th>':''}<th>Entry</th><th>Exit</th><th>PnL</th><th>Result</th><th>Opened</th></tr></thead><tbody>
+  ${trades.map(t=>`<tr><td style="font-family:var(--mono);font-weight:500">${t.symbol}</td><td><span class="badge ${t.direction}">${t.direction?.toUpperCase()}</span></td>${full?`<td><span class="tf-chip">${t.timeframe||'H1'}</span></td>`:''}<td class="mono">${t.entry_price?.toFixed(5)||'—'}</td><td class="mono">${t.exit_price?.toFixed(5)||'<span style="color:var(--amber)">Open</span>'}</td><td class="mono" style="color:${(t.pnl||0)>=0?'var(--accent)':'var(--red)'}">${t.pnl!=null?((t.pnl>=0?'+':'')+'$'+t.pnl.toFixed(2)):'—'}</td><td>${t.exit_price?`<span class="badge ${t.won?'buy':'sell'}">${t.won?'WIN':'LOSS'}</span>`:'<span class="badge pending">OPEN</span>'}</td><td class="mono" style="color:var(--muted)">${timeAgo(t.opened_at)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 // ── SETTINGS ─────────────────────────────────────────────────────
-async function loadSettings() {
-  try {
-    const { data } = await supabase.from('settings').select('*').eq('user_id', currentUser.id).maybeSingle();
-    if (!data) return;
-    if (data.risk_per_trade)  document.getElementById('set-risk').value = (data.risk_per_trade*100).toFixed(1);
-    if (data.max_daily_dd)    document.getElementById('set-dd').value   = (data.max_daily_dd*100).toFixed(1);
-    if (data.max_open_trades) document.getElementById('set-max').value  = data.max_open_trades;
-    if (data.ai_threshold)    document.getElementById('set-ai').value   = Math.round(data.ai_threshold*100);
-  } catch(e) { console.error('Load settings error:', e); }
+async function loadSettingsPage() {
+  if(!_user) return;
+  const data = await sbGet('settings',`user_id=eq.${_user.id}&limit=1`);
+  const d = data && data[0]; if(!d) return;
+  if(d.risk_per_trade) document.getElementById('set-risk').value=(d.risk_per_trade*100).toFixed(1);
+  if(d.max_daily_dd)   document.getElementById('set-dd').value=(d.max_daily_dd*100).toFixed(1);
+  if(d.max_open_trades)document.getElementById('set-max').value=d.max_open_trades;
+  if(d.ai_threshold)   document.getElementById('set-ai').value=Math.round(d.ai_threshold*100);
 }
 
 async function saveSettings() {
-  try {
-    const settings = {
-      user_id: currentUser.id,
-      risk_per_trade:  parseFloat(document.getElementById('set-risk').value) / 100,
-      max_daily_dd:    parseFloat(document.getElementById('set-dd').value) / 100,
-      max_open_trades: parseInt(document.getElementById('set-max').value),
-      ai_threshold:    parseInt(document.getElementById('set-ai').value) / 100,
-      session_247:     document.getElementById('tf-247').checked,
-      avoid_news:      document.getElementById('tf-news').checked,
-      updated_at:      new Date().toISOString(),
-    };
-    const { error } = await supabase.from('settings').upsert(settings, { onConflict: 'user_id' });
-    if (error) { showToast('Save failed: ' + error.message, 'err'); return; }
-    showToast('Settings saved', 'ok');
-  } catch(e) { showToast('Save failed — network error', 'err'); }
-}
-
-// ── REALTIME ─────────────────────────────────────────────────────
-function subscribeRealtime() {
-  try {
-    realtimeSub = supabase.channel('apex-live')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'signals' }, payload => {
-        showToast(`📡 New ${payload.new.direction?.toUpperCase()} signal — ${payload.new.symbol} ${payload.new.timeframe}`, 'ok');
-        loadLiveSignals();
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trades' }, payload => {
-        showToast(`✅ Trade executed — ${payload.new.direction?.toUpperCase()} ${payload.new.symbol}`, 'ok');
-        loadMetrics(); loadRecentTrades();
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'trades' }, payload => {
-        if (payload.new.exit_price) {
-          const won = payload.new.won;
-          showToast(`${won ? '🏆 WIN' : '📉 LOSS'} — ${payload.new.symbol} ${won?'+':''}$${payload.new.pnl?.toFixed(2)}`, won ? 'ok' : 'err');
-          loadMetrics(); loadRecentTrades();
-        }
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'account_snapshots' }, () => loadMetrics())
-      .subscribe(status => {
-        const live = status === 'SUBSCRIBED';
-        document.getElementById('conn-dot').className = 'dot ' + (live ? 'live' : 'off');
-        document.getElementById('conn-label').textContent = live ? 'Live' : 'Connecting...';
-      });
-  } catch(e) { console.error('Realtime error:', e); }
+  if(!_user){showToast('Not logged in','err');return;}
+  const ok = await sbUpsert('settings',{
+    user_id:_user.id,
+    risk_per_trade: parseFloat(document.getElementById('set-risk').value)/100,
+    max_daily_dd:   parseFloat(document.getElementById('set-dd').value)/100,
+    max_open_trades:parseInt(document.getElementById('set-max').value),
+    ai_threshold:   parseInt(document.getElementById('set-ai').value)/100,
+    session_247:    document.getElementById('tf-247').checked,
+    avoid_news:     document.getElementById('tf-news').checked,
+    updated_at:     new Date().toISOString()
+  });
+  showToast(ok ? 'Settings saved' : 'Save failed', ok ? 'ok' : 'err');
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────
 function timeAgo(iso) {
-  if (!iso) return '—';
-  const d = Math.floor((Date.now() - new Date(iso)) / 1000);
-  if (d < 60) return d + 's ago';
-  if (d < 3600) return Math.floor(d/60) + 'm ago';
-  if (d < 86400) return Math.floor(d/3600) + 'h ago';
-  return Math.floor(d/86400) + 'd ago';
+  if(!iso) return '—';
+  const d=Math.floor((Date.now()-new Date(iso))/1000);
+  if(d<60) return d+'s ago'; if(d<3600) return Math.floor(d/60)+'m ago';
+  if(d<86400) return Math.floor(d/3600)+'h ago'; return Math.floor(d/86400)+'d ago';
 }
 
-function showToast(msg, type='ok') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3500);
+function showToast(m, type='ok') {
+  const t=document.getElementById('toast'); t.textContent=m;
+  t.className=`toast ${type} show`; setTimeout(()=>t.classList.remove('show'),3500);
 }
+
+// ── BOOT ─────────────────────────────────────────────────────────
+if (restoreSession()) showApp();
+setInterval(()=>{ if(_token) loadMetrics(); }, 30000);
 </script>
 </body>
 </html>
