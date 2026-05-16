@@ -7,10 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-
-<!-- ═══════════════════════════════════════════════════════════
-     SUPABASE SDK  (loaded once, used everywhere via window.supabase)
-     ═══════════════════════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -30,7 +26,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px;}
 .shell{display:flex;height:100vh;width:100vw;overflow:hidden;}
 
-/* ─── Sidebar ─── */
+/* Sidebar */
 .sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;flex-shrink:0;position:relative;z-index:10;}
 .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#00d4aa22,#0088ff22);border:0.5px solid var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:14px;position:relative;overflow:hidden;}
 .logo::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(0,212,170,0.15));}
@@ -47,7 +43,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .conn-label{font-size:9px;color:var(--text3);font-family:var(--mono);letter-spacing:.5px;}
 @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
 
-/* ─── Main ─── */
+/* Main */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 .topbar{height:var(--topbar-h);flex-shrink:0;background:var(--bg2);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;}
 .topbar-title{font-size:15px;font-weight:600;color:var(--text);flex:1;}
@@ -65,7 +61,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tab-page{display:none;flex-direction:column;gap:14px;}
 .tab-page.active{display:flex;}
 
-/* ─── Toast ─── */
+/* Toast */
 .toast{position:fixed;bottom:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:8px;}
 .toast-item{background:var(--bg3);border:0.5px solid var(--border2);border-radius:10px;padding:10px 14px;font-size:12px;font-family:var(--mono);color:var(--text);display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:toast-in .3s ease;min-width:260px;}
 .toast-item.success{border-left:2px solid var(--up);}
@@ -73,7 +69,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .toast-item.info{border-left:2px solid var(--accent);}
 @keyframes toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* ─── Supabase status ─── */
+/* Supabase status */
 .sb-status-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;background:var(--bg3);border:0.5px solid var(--border);}
 .sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .sb-dot.connected{background:var(--up);box-shadow:0 0 6px var(--up);}
@@ -90,16 +86,22 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .sb-miss{background:rgba(255,77,106,.10);color:var(--down);}
 .sb-schema{font-size:11px;color:var(--text3);font-family:var(--mono);line-height:1.9;padding:10px 12px;background:var(--bg3);border-radius:8px;border:0.5px solid var(--border);overflow-x:auto;white-space:pre;}
 
-/* ─── Ticker ─── */
-.ticker-strip{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;gap:6px;overflow-x:auto;}
-.ticker-item{flex-shrink:0;padding:7px 14px;border-radius:8px;background:var(--bg3);border:0.5px solid var(--border);cursor:pointer;transition:border-color .15s;}
+/* Ticker */
+.ticker-strip{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;gap:6px;overflow-x:auto;align-items:center;}
+.ticker-live-dot{width:6px;height:6px;border-radius:50%;background:var(--up);box-shadow:0 0 5px var(--up);animation:pulse-dot 1.5s ease-in-out infinite;flex-shrink:0;margin-right:4px;}
+.ticker-item{flex-shrink:0;padding:7px 14px;border-radius:8px;background:var(--bg3);border:0.5px solid var(--border);cursor:pointer;transition:all .15s;position:relative;}
 .ticker-item:hover{border-color:var(--accent);}
+.ticker-item.flash-up{border-color:var(--up);background:rgba(0,201,122,.08);}
+.ticker-item.flash-dn{border-color:var(--down);background:rgba(255,77,106,.06);}
 .ticker-sym{font-size:10px;font-family:var(--mono);color:var(--text3);letter-spacing:.5px;}
 .ticker-price{font-size:14px;font-weight:600;color:var(--text);font-family:var(--mono);}
-.ticker-chg{font-size:10px;font-family:var(--mono);}
-.chg-up{color:var(--up);} .chg-dn{color:var(--down);}
+.ticker-meta{font-size:9px;font-family:var(--mono);color:var(--text3);margin-top:1px;display:flex;gap:6px;}
+.ticker-bid{color:var(--down);}
+.ticker-ask{color:var(--up);}
+.ticker-spread{color:var(--text3);}
+.ticker-empty{font-size:11px;font-family:var(--mono);color:var(--text3);padding:4px 8px;}
 
-/* ─── Stats ─── */
+/* Stats */
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .stat-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 14px;position:relative;overflow:hidden;}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.4;}
@@ -109,14 +111,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .stat-sub{font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono);}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
-/* ─── Card ─── */
+/* Card */
 .card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 16px;}
 .card.glow{box-shadow:0 0 0 0.5px var(--accent),0 0 20px rgba(0,212,170,0.06);}
 .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .card-title{font-size:11px;font-weight:500;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;}
 .card-action{font-size:11px;color:var(--accent);cursor:pointer;background:none;border:none;font-family:var(--font);}
 
-/* ─── Tables ─── */
+/* Tables */
 .trade-table{width:100%;border-collapse:collapse;font-size:12px;}
 .trade-table th{text-align:left;padding:5px 8px;color:var(--text3);font-weight:500;border-bottom:0.5px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;}
 .trade-table td{padding:7px 8px;border-bottom:0.5px solid var(--border);color:var(--text);font-family:var(--mono);}
@@ -124,14 +126,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .trade-table tr:hover td{background:var(--bg3);}
 .dir-buy{color:var(--up);font-weight:600;} .dir-sell{color:var(--down);font-weight:600;}
 
-/* ─── SMC Flow ─── */
+/* SMC Flow */
 .smc-flow{display:flex;align-items:center;gap:0;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;overflow-x:auto;}
 .smc-step{display:flex;align-items:center;flex-shrink:0;}
 .smc-step-pill{font-size:11px;font-family:var(--mono);padding:5px 12px;border-radius:20px;white-space:nowrap;font-weight:500;border:0.5px solid var(--border2);color:var(--text3);background:var(--bg3);transition:all .2s;}
 .smc-step-pill.lit{color:var(--accent);border-color:var(--accent);background:rgba(0,212,170,.08);}
 .smc-arrow{font-size:11px;color:var(--text3);padding:0 6px;}
 
-/* ─── Rules ─── */
+/* Rules */
 .rule-list{display:flex;flex-direction:column;gap:7px;}
 .rule-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg3);border-radius:9px;border:0.5px solid var(--border);border-left:2px solid transparent;transition:border-color .2s;}
 .rule-item.enabled{border-left-color:var(--up);}
@@ -154,12 +156,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .rule-toggle.on::after{left:15px;}
 .rule-toggle.off::after{left:2px;}
 
-/* ─── Filters ─── */
+/* Filters */
 .filter-list{display:flex;flex-direction:column;gap:6px;}
 .filter-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(255,77,106,.05);border:0.5px solid rgba(255,77,106,.15);font-size:12px;font-family:var(--mono);color:var(--text2);}
 .filter-item i{color:var(--down);font-size:14px;flex-shrink:0;}
 
-/* ─── TF grid ─── */
+/* TF grid */
 .tf-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
 .tf-card{padding:12px 14px;border-radius:10px;border:0.5px solid var(--border);background:var(--bg3);position:relative;overflow:hidden;}
 .tf-card::after{content:attr(data-tf);position:absolute;right:8px;bottom:6px;font-size:28px;font-family:var(--mono);font-weight:700;color:var(--border2);pointer-events:none;}
@@ -167,7 +169,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tf-role{font-size:11px;color:var(--text2);margin-top:4px;font-weight:600;}
 .tf-desc{font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--mono);line-height:1.5;}
 
-/* ─── Forms ─── */
+/* Forms */
 .strategy-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;margin-top:10px;}
 .risk-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
@@ -181,12 +183,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .add-btn.full{width:100%;justify-content:center;margin-top:10px;}
 .add-btn:disabled{opacity:.4;cursor:not-allowed;}
 
-/* ─── Markets ─── */
+/* Markets */
 .chip-wrap{display:flex;gap:7px;flex-wrap:wrap;}
 .chip{font-size:11px;padding:5px 12px;border-radius:20px;background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;color:var(--text2);font-family:var(--mono);transition:all .15s;}
 .chip:hover,.chip.active{background:rgba(0,212,170,.12);border-color:var(--accent);color:var(--accent);}
 
-/* ─── Patterns ─── */
+/* Patterns */
 .pattern-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);}
 .pattern-item:last-child{border-bottom:none;}
 .pattern-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
@@ -199,7 +201,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .pattern-meta{font-size:11px;color:var(--text3);margin-top:1px;font-family:var(--mono);}
 .pattern-conf{font-size:12px;font-weight:600;color:var(--accent);margin-left:auto;padding-top:4px;font-family:var(--mono);}
 
-/* ─── Perf ─── */
+/* Perf */
 .perf-item{display:flex;align-items:center;gap:10px;font-size:12px;}
 .perf-label{flex:1;color:var(--text2);font-family:var(--mono);font-size:11px;}
 .perf-bar-bg{width:100px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;flex-shrink:0;}
@@ -212,7 +214,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .bar-label{font-size:10px;color:var(--text3);font-family:var(--mono);}
 .bar-val{font-size:10px;color:var(--up);font-family:var(--mono);font-weight:500;}
 
-/* ─── Misc ─── */
+/* Misc */
 .conn-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
 .conn-dot-sm{width:6px;height:6px;border-radius:50%;background:var(--up);flex-shrink:0;}
 .notif-list{display:flex;flex-direction:column;gap:10px;}
@@ -223,142 +225,59 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tip{font-size:10px;color:var(--text3);font-family:var(--mono);}
 body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:9999;}
 
-/* ════════════════════════════════════════════════════════
-   AUTH OVERLAY
-   ════════════════════════════════════════════════════════ */
+/* AUTH OVERLAY */
 .auth-overlay{
   position:fixed;inset:0;z-index:99998;
   background:var(--bg);
   display:flex;align-items:center;justify-content:center;
-  /* animated grid bg */
   background-image:
     linear-gradient(rgba(0,212,170,.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,212,170,.04) 1px, transparent 1px);
   background-size:40px 40px;
 }
 .auth-overlay.hidden{display:none;}
-
-.auth-wrap{
-  width:100%;max-width:400px;padding:0 20px;
-  display:flex;flex-direction:column;align-items:center;gap:28px;
-}
-
-/* brand */
+.auth-wrap{width:100%;max-width:400px;padding:0 20px;display:flex;flex-direction:column;align-items:center;gap:28px;}
 .auth-brand{display:flex;flex-direction:column;align-items:center;gap:10px;}
-.auth-logo{
-  width:52px;height:52px;border-radius:14px;
-  background:linear-gradient(135deg,#00d4aa18,#0088ff18);
-  border:0.5px solid var(--accent);
-  display:flex;align-items:center;justify-content:center;position:relative;
-}
+.auth-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#00d4aa18,#0088ff18);border:0.5px solid var(--accent);display:flex;align-items:center;justify-content:center;position:relative;}
 .auth-logo svg{width:28px;height:28px;}
-.auth-logo-ring{
-  position:absolute;inset:-6px;border-radius:20px;
-  border:0.5px solid rgba(0,212,170,.15);
-  animation:ring-pulse 2.5s ease-in-out infinite;
-}
+.auth-logo-ring{position:absolute;inset:-6px;border-radius:20px;border:0.5px solid rgba(0,212,170,.15);animation:ring-pulse 2.5s ease-in-out infinite;}
 @keyframes ring-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.04)}}
 .auth-brand-name{font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
 .auth-brand-sub{font-size:12px;color:var(--text3);font-family:var(--mono);letter-spacing:.5px;}
-
-/* card */
-.auth-card{
-  width:100%;
-  background:var(--bg2);border:0.5px solid var(--border2);
-  border-radius:16px;padding:28px;
-  box-shadow:0 0 0 0.5px var(--accent),0 0 40px rgba(0,212,170,.06);
-}
+.auth-card{width:100%;background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:28px;box-shadow:0 0 0 0.5px var(--accent),0 0 40px rgba(0,212,170,.06);}
 .auth-card-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;}
 .auth-card-sub{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:22px;}
-
-/* tabs */
 .auth-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--bg3);border-radius:9px;padding:3px;}
-.auth-tab{
-  flex:1;padding:7px;border-radius:7px;border:none;cursor:pointer;
-  font-size:12px;font-family:var(--font);font-weight:500;
-  background:transparent;color:var(--text3);transition:all .2s;
-}
+.auth-tab{flex:1;padding:7px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-family:var(--font);font-weight:500;background:transparent;color:var(--text3);transition:all .2s;}
 .auth-tab.active{background:var(--bg4);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3);}
-
-/* inputs */
 .auth-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
 .auth-label{font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;}
 .auth-input-wrap{position:relative;}
-.auth-input{
-  width:100%;padding:10px 12px 10px 36px;
-  background:var(--bg3);border:0.5px solid var(--border2);
-  border-radius:9px;color:var(--text);font-size:13px;
-  font-family:var(--mono);outline:none;transition:border-color .15s;
-}
+.auth-input{width:100%;padding:10px 12px 10px 36px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:9px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s;}
 .auth-input:focus{border-color:var(--accent);}
-.auth-input-icon{
-  position:absolute;left:10px;top:50%;transform:translateY(-50%);
-  font-size:15px;color:var(--text3);pointer-events:none;
-}
-.auth-input-toggle{
-  position:absolute;right:10px;top:50%;transform:translateY(-50%);
-  font-size:14px;color:var(--text3);cursor:pointer;background:none;border:none;padding:2px;
-}
+.auth-input-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--text3);pointer-events:none;}
+.auth-input-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text3);cursor:pointer;background:none;border:none;padding:2px;}
 .auth-input-toggle:hover{color:var(--text2);}
-
-/* submit btn */
-.auth-submit{
-  width:100%;padding:11px;margin-top:6px;
-  border-radius:9px;border:none;
-  background:var(--accent);color:#000;
-  font-size:13px;font-weight:700;font-family:var(--font);
-  cursor:pointer;transition:opacity .15s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
+.auth-submit{width:100%;padding:11px;margin-top:6px;border-radius:9px;border:none;background:var(--accent);color:#000;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .auth-submit:hover{opacity:.88;}
 .auth-submit:disabled{opacity:.45;cursor:not-allowed;}
-.auth-submit .spin{
-  width:14px;height:14px;border-radius:50%;
-  border:2px solid rgba(0,0,0,.3);border-top-color:#000;
-  animation:spin .7s linear infinite;display:none;
-}
+.auth-submit .spin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,0,0,.3);border-top-color:#000;animation:spin .7s linear infinite;display:none;}
 .auth-submit.loading .spin{display:block;}
 .auth-submit.loading .btn-text{opacity:0;}
-
-/* error / success */
-.auth-msg{
-  font-size:12px;font-family:var(--mono);padding:9px 12px;
-  border-radius:8px;margin-top:10px;display:none;
-}
+.auth-msg{font-size:12px;font-family:var(--mono);padding:9px 12px;border-radius:8px;margin-top:10px;display:none;}
 .auth-msg.error{background:rgba(255,77,106,.1);color:var(--down);border:0.5px solid rgba(255,77,106,.2);}
 .auth-msg.success{background:rgba(0,201,122,.1);color:var(--up);border:0.5px solid rgba(0,201,122,.2);}
 .auth-msg.visible{display:block;}
-
-/* divider */
 .auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0 0;color:var(--text3);font-size:11px;font-family:var(--mono);}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:0.5px;background:var(--border2);}
-
-/* forgot */
-.auth-forgot{
-  font-size:11px;color:var(--accent);background:none;border:none;
-  cursor:pointer;font-family:var(--font);margin-top:10px;align-self:flex-end;
-}
+.auth-forgot{font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font);margin-top:10px;align-self:flex-end;}
 .auth-forgot:hover{opacity:.7;}
-
-/* footer */
 .auth-footer{font-size:11px;color:var(--text3);font-family:var(--mono);text-align:center;line-height:1.7;}
 .auth-footer a{color:var(--accent);text-decoration:none;}
-
-/* ── user pill in topbar ── */
-.user-pill{
-  display:flex;align-items:center;gap:7px;padding:4px 10px 4px 6px;
-  border-radius:20px;background:var(--bg3);border:0.5px solid var(--border2);
-  cursor:pointer;transition:border-color .15s;
-}
+.user-pill{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 6px;border-radius:20px;background:var(--bg3);border:0.5px solid var(--border2);cursor:pointer;transition:border-color .15s;}
 .user-pill:hover{border-color:var(--accent);}
-.user-avatar{
-  width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;color:#000;font-family:var(--mono);flex-shrink:0;
-}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000;font-family:var(--mono);flex-shrink:0;}
 .user-email{font-size:11px;font-family:var(--mono);color:var(--text2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -366,7 +285,7 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 
 <div class="shell">
 
-  <!-- ══ SIDEBAR ══ -->
+  <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="logo">
       <svg viewBox="0 0 20 20" fill="none">
@@ -387,13 +306,12 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
     </div>
   </nav>
 
-  <!-- ══ MAIN ══ -->
+  <!-- MAIN -->
   <div class="main">
     <header class="topbar">
       <div class="topbar-title" id="topbar-title">Live Monitor <span>SMC Engine · MT5 · Supabase Live</span></div>
       <span class="badge" id="sb-topbadge" style="display:none"></span>
       <span class="badge badge-green" id="bot-badge">● Bot Running</span>
-      <!-- user pill — shown after login -->
       <div class="user-pill" id="user-pill" style="display:none" onclick="AUTH.showUserMenu()">
         <div class="user-avatar" id="user-avatar">?</div>
         <span class="user-email" id="user-email-display">—</span>
@@ -405,7 +323,7 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
 
     <main class="content">
 
-      <!-- ══ MONITOR ══ -->
+      <!-- MONITOR -->
       <section class="tab-page active" id="tab-monitor">
         <div class="smc-flow">
           <div class="smc-step"><span class="smc-step-pill lit">Identify LH/HL</span></div><div class="smc-arrow">→</div>
@@ -417,7 +335,11 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
           <div class="smc-step"><span class="smc-step-pill" id="flow-expand">3R Target</span></div>
         </div>
 
-        <div class="ticker-strip" id="ticker-row"></div>
+        <!-- LIVE MT5 TICKER — fed from Supabase market_prices table -->
+        <div class="ticker-strip" id="ticker-row">
+          <div class="ticker-live-dot"></div>
+          <span class="ticker-empty">Connecting to MT5 prices…</span>
+        </div>
 
         <div class="stat-row">
           <div class="stat-card"><div class="stat-label">Open Trades</div><div class="stat-value" id="s-open">—</div><div class="stat-sub" id="s-open-sub">Loading…</div></div>
@@ -452,9 +374,8 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
         </div>
       </section>
 
-      <!-- ══ STRATEGY ══ -->
+      <!-- STRATEGY -->
       <section class="tab-page" id="tab-strategy">
-        <!-- System Overview Cards -->
         <div class="stat-row" style="grid-template-columns:repeat(3,1fr)">
           <div class="stat-card" style="border-left:2px solid var(--up)">
             <div class="stat-label" style="color:#00ffcc">System 1 — Bearish → Bullish</div>
@@ -533,7 +454,7 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
         </div>
 
         <div class="card">
-          <div class="card-header"><span class="card-title">⚡ Do Not Trade — Filter Rules</span><span class="badge badge-red">Blockers</span></div>
+          <div class="card-header"><span class="card-title">Do Not Trade — Filter Rules</span><span class="badge badge-red">Blockers</span></div>
           <div class="filter-list" id="filter-list"></div>
         </div>
 
@@ -557,12 +478,12 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
         </div>
 
         <div class="card">
-          <div class="card-header"><span class="card-title">Markets to Trade</span></div>
-          <div class="chip-wrap" id="market-chips"></div>
+          <div class="card-header"><span class="card-title">Markets to Trade</span><span class="badge badge-blue" id="market-count">Loading…</span></div>
+          <div class="chip-wrap" id="market-chips"><span style="font-size:11px;color:var(--text3);font-family:var(--mono)">Loading from MT5 Market Watch…</span></div>
         </div>
       </section>
 
-      <!-- ══ PATTERNS ══ -->
+      <!-- PATTERNS -->
       <section class="tab-page" id="tab-patterns">
         <div class="stat-row">
           <div class="stat-card"><div class="stat-label">Liq. Sweeps</div><div class="stat-value" id="ps-liq" style="color:var(--purple)">—</div><div class="stat-sub">Last 4h</div></div>
@@ -594,10 +515,10 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
         </div>
       </section>
 
-      <!-- ══ ANALYTICS ══ -->
+      <!-- ANALYTICS -->
       <section class="tab-page" id="tab-analytics">
         <div class="stat-row">
-          <div class="stat-card"><div class="stat-label">Total Profit (30d)</div><div class="stat-value up" id="an-profit">+$8,420</div><div class="stat-sub">↑ 12.4%</div></div>
+          <div class="stat-card"><div class="stat-label">Total Profit (30d)</div><div class="stat-value up" id="an-profit">+$8,420</div><div class="stat-sub">12.4%</div></div>
           <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value" id="an-wr">68%</div><div class="stat-sub" id="an-wr-sub">— / — trades</div></div>
           <div class="stat-card"><div class="stat-label">Profit Factor</div><div class="stat-value">2.14</div><div class="stat-sub">Excellent</div></div>
           <div class="stat-card"><div class="stat-label">Max Drawdown</div><div class="stat-value down">-4.2%</div><div class="stat-sub">Within limits</div></div>
@@ -631,93 +552,29 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
         </div>
       </section>
 
-      <!-- ══ SETTINGS ══ -->
+      <!-- SETTINGS -->
       <section class="tab-page" id="tab-settings">
-
-        <!-- ── SUPABASE CONNECTION CARD ── -->
         <div class="card glow" id="sb-card">
           <div class="card-header">
             <span class="card-title">Supabase Connection</span>
             <span class="badge" id="sb-badge" style="background:rgba(245,166,35,.12);color:var(--amber);border:0.5px solid rgba(245,166,35,.25)">Connecting…</span>
           </div>
-
           <div class="sb-status-row" style="margin-bottom:12px">
             <div class="sb-dot connecting" id="sb-dot"></div>
             <div class="sb-info">
               <div class="sb-label" id="sb-status-label">Initialising Supabase client…</div>
-              <div class="sb-sub" id="sb-status-sub">Configured in &lt;script&gt; — one connection only</div>
+              <div class="sb-sub" id="sb-status-sub">Configured in script — one connection only</div>
             </div>
           </div>
-
           <div style="margin-bottom:12px">
             <div class="sb-table-row"><span class="sb-table-name">smc_rules</span><span class="sb-table-status" id="st-rules">Checking…</span></div>
             <div class="sb-table-row"><span class="sb-table-name">open_trades</span><span class="sb-table-status" id="st-trades">Checking…</span></div>
             <div class="sb-table-row"><span class="sb-table-name">executions</span><span class="sb-table-status" id="st-exec">Checking…</span></div>
             <div class="sb-table-row"><span class="sb-table-name">smc_patterns</span><span class="sb-table-status" id="st-patterns">Checking…</span></div>
             <div class="sb-table-row"><span class="sb-table-name">analytics</span><span class="sb-table-status" id="st-analytics">Checking…</span></div>
+            <div class="sb-table-row"><span class="sb-table-name">market_prices</span><span class="sb-table-status" id="st-prices">Checking…</span></div>
+            <div class="sb-table-row"><span class="sb-table-name">active_markets</span><span class="sb-table-status" id="st-markets">Checking…</span></div>
           </div>
-
-          <details style="margin-bottom:10px">
-            <summary style="font-size:11px;color:var(--accent);cursor:pointer;font-family:var(--mono);margin-bottom:8px">▸ SQL — Create all tables in Supabase</summary>
-            <div class="sb-schema" id="sb-schema-sql">-- Run this once in Supabase SQL Editor
-
-create table if not exists smc_rules (
-  id          uuid primary key default gen_random_uuid(),
-  text        text not null,
-  tag         text not null default 'entry',  -- bias | mss | liq | entry | risk
-  enabled     boolean not null default true,
-  created_at  timestamptz default now()
-);
-
-create table if not exists open_trades (
-  id          uuid primary key default gen_random_uuid(),
-  symbol      text not null,
-  direction   text not null,               -- BUY | SELL
-  lots        numeric(6,2) not null,
-  open_price  text not null,
-  pnl         text,
-  created_at  timestamptz default now()
-);
-
-create table if not exists executions (
-  id          uuid primary key default gen_random_uuid(),
-  exec_time   text,
-  symbol      text not null,
-  direction   text not null,
-  price       text,
-  sl          text,
-  tp          text,
-  signal      text,
-  status      text,
-  created_at  timestamptz default now()
-);
-
-create table if not exists smc_patterns (
-  id          uuid primary key default gen_random_uuid(),
-  name        text not null,
-  symbol      text,
-  confidence  text,
-  direction   text,                        -- bull | bear | liq | block
-  detected_at text,
-  sub         text,
-  created_at  timestamptz default now()
-);
-
-create table if not exists analytics (
-  id          uuid primary key default gen_random_uuid(),
-  metric      text not null,
-  value       text not null,
-  updated_at  timestamptz default now()
-);
-
--- Enable Realtime on all tables (run in Supabase dashboard > Database > Replication)
--- or run:
-alter publication supabase_realtime add table open_trades;
-alter publication supabase_realtime add table executions;
-alter publication supabase_realtime add table smc_patterns;
-alter publication supabase_realtime add table smc_rules;</div>
-          </details>
-
           <button class="add-btn full" onclick="DB.testConnection()"><i class="ti ti-reload"></i> Re-test Connection</button>
         </div>
 
@@ -732,7 +589,7 @@ alter publication supabase_realtime add table smc_rules;</div>
             <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" placeholder="••••••••"></div>
             <div class="form-group"><label class="form-label">Magic Number</label><input class="form-input" type="text" value="777001"></div>
           </div>
-          <button class="add-btn full" onclick="alert('Testing MT5 connection…\nMake sure your Python MT5 bridge is running on port 5000.')"><i class="ti ti-plug"></i> Test Connection</button>
+          <button class="add-btn full" onclick="alert('Testing MT5 connection…\nMake sure your Python MT5 bridge is running.')"><i class="ti ti-plug"></i> Test Connection</button>
         </div>
 
         <div class="card">
@@ -743,7 +600,7 @@ alter publication supabase_realtime add table smc_rules;</div>
             <div class="form-group"><label class="form-label">Order Type</label>
               <select class="form-select"><option>Limit Orders (OB/FVG)</option><option>Market Orders</option><option>Both</option></select></div>
             <div class="form-group"><label class="form-label">Slippage (pips)</label><input class="form-input" type="text" value="2"></div>
-            <div class="form-group"><label class="form-label">Comment Tag</label><input class="form-input" type="text" value="AlgoBot_SMC_v1"></div>
+            <div class="form-group"><label class="form-label">Comment Tag</label><input class="form-input" type="text" value="AlgoBot_SMC_v3"></div>
           </div>
         </div>
 
@@ -753,7 +610,7 @@ alter publication supabase_realtime add table smc_rules;</div>
             <label class="notif-item"><input type="checkbox" checked> Trade opened (SMC entry confirmed)</label>
             <label class="notif-item"><input type="checkbox" checked> Trade closed</label>
             <label class="notif-item"><input type="checkbox" checked> Liquidity sweep detected</label>
-            <label class="notif-item"><input type="checkbox" checked> MSS confirmed (≥ 15M)</label>
+            <label class="notif-item"><input type="checkbox" checked> MSS confirmed (15M+)</label>
             <label class="notif-item"><input type="checkbox" checked> FVG / Order Block entry zone active</label>
             <label class="notif-item"><input type="checkbox"> Signal blocked by filter rules</label>
             <label class="notif-item"><input type="checkbox" checked> Daily loss limit hit (emergency stop)</label>
@@ -769,7 +626,7 @@ alter publication supabase_realtime add table smc_rules;</div>
             <div>System 2: <span style="color:var(--down)">Bullish→Bearish · Break HL (creates HH) · 3 candles · 0.5–0.618 retrace · Rejection · 3R</span></div>
             <div>System 3: <span style="color:var(--amber)">Trend Continuation · Every swing break · 0.5–0.618 retrace · Rejection · 3R</span></div>
             <div>MTF Gate: <span style="color:var(--text2)">1M → 5M → 15M → 1H — all must confirm, no exceptions</span></div>
-            <div>Markets: <span style="color:var(--text2)">All MT5 Watchlist — Forex · Commodities · Indices</span></div>
+            <div>Markets: <span style="color:var(--text2)">All MT5 Market Watch — synced live via Python bridge</span></div>
           </div>
         </div>
       </section>
@@ -778,13 +635,9 @@ alter publication supabase_realtime add table smc_rules;</div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════
-     AUTH OVERLAY — shown before login, hidden after session found
-     ══════════════════════════════════════════════════════════ -->
+<!-- AUTH OVERLAY -->
 <div class="auth-overlay" id="auth-overlay">
   <div class="auth-wrap">
-
-    <!-- Brand -->
     <div class="auth-brand">
       <div class="auth-logo">
         <div class="auth-logo-ring"></div>
@@ -798,20 +651,15 @@ alter publication supabase_realtime add table smc_rules;</div>
       <div class="auth-brand-sub">MT5 · Smart Money Concepts Engine</div>
     </div>
 
-    <!-- Card -->
     <div class="auth-card">
-
-      <!-- Sign In / Sign Up tabs -->
       <div class="auth-tabs">
         <button class="auth-tab active" id="tab-signin" onclick="AUTH.switchTab('signin')">Sign In</button>
         <button class="auth-tab"        id="tab-signup" onclick="AUTH.switchTab('signup')">Create Account</button>
       </div>
 
-      <!-- ── SIGN IN FORM ── -->
       <div id="form-signin">
         <div class="auth-card-title">Welcome back</div>
         <div class="auth-card-sub">Sign in to access your trading dashboard</div>
-
         <div class="auth-field">
           <label class="auth-label">Email</label>
           <div class="auth-input-wrap">
@@ -819,7 +667,6 @@ alter publication supabase_realtime add table smc_rules;</div>
             <input class="auth-input" type="email" id="si-email" placeholder="you@example.com" autocomplete="email">
           </div>
         </div>
-
         <div class="auth-field">
           <label class="auth-label">Password</label>
           <div class="auth-input-wrap">
@@ -828,22 +675,16 @@ alter publication supabase_realtime add table smc_rules;</div>
             <button class="auth-input-toggle" onclick="AUTH.togglePwd('si-password',this)" tabindex="-1"><i class="ti ti-eye"></i></button>
           </div>
         </div>
-
         <button class="auth-forgot" onclick="AUTH.forgotPassword()">Forgot password?</button>
-
         <button class="auth-submit" id="signin-btn" onclick="AUTH.signIn()">
-          <div class="spin"></div>
-          <span class="btn-text">Sign In</span>
+          <div class="spin"></div><span class="btn-text">Sign In</span>
         </button>
-
         <div class="auth-msg" id="si-msg"></div>
       </div>
 
-      <!-- ── SIGN UP FORM ── -->
       <div id="form-signup" style="display:none">
         <div class="auth-card-title">Create your account</div>
         <div class="auth-card-sub">One account — all your trading data in Supabase</div>
-
         <div class="auth-field">
           <label class="auth-label">Email</label>
           <div class="auth-input-wrap">
@@ -851,7 +692,6 @@ alter publication supabase_realtime add table smc_rules;</div>
             <input class="auth-input" type="email" id="su-email" placeholder="you@example.com" autocomplete="email">
           </div>
         </div>
-
         <div class="auth-field">
           <label class="auth-label">Password <span style="color:var(--text3)">(min 8 characters)</span></label>
           <div class="auth-input-wrap">
@@ -860,7 +700,6 @@ alter publication supabase_realtime add table smc_rules;</div>
             <button class="auth-input-toggle" onclick="AUTH.togglePwd('su-password',this)" tabindex="-1"><i class="ti ti-eye"></i></button>
           </div>
         </div>
-
         <div class="auth-field">
           <label class="auth-label">Confirm Password</label>
           <div class="auth-input-wrap">
@@ -868,20 +707,15 @@ alter publication supabase_realtime add table smc_rules;</div>
             <input class="auth-input" type="password" id="su-confirm" placeholder="repeat password" autocomplete="new-password" onkeydown="if(event.key==='Enter')AUTH.signUp()">
           </div>
         </div>
-
         <button class="auth-submit" id="signup-btn" onclick="AUTH.signUp()">
-          <div class="spin"></div>
-          <span class="btn-text">Create Account</span>
+          <div class="spin"></div><span class="btn-text">Create Account</span>
         </button>
-
         <div class="auth-msg" id="su-msg"></div>
       </div>
 
-      <!-- ── RESET PASSWORD FORM ── -->
       <div id="form-reset" style="display:none">
         <div class="auth-card-title">Reset password</div>
         <div class="auth-card-sub">Enter your email — we'll send a reset link</div>
-
         <div class="auth-field">
           <label class="auth-label">Email</label>
           <div class="auth-input-wrap">
@@ -889,171 +723,107 @@ alter publication supabase_realtime add table smc_rules;</div>
             <input class="auth-input" type="email" id="rp-email" placeholder="you@example.com">
           </div>
         </div>
-
         <button class="auth-submit" id="reset-btn" onclick="AUTH.sendReset()">
-          <div class="spin"></div>
-          <span class="btn-text">Send Reset Link</span>
+          <div class="spin"></div><span class="btn-text">Send Reset Link</span>
         </button>
-
         <div class="auth-msg" id="rp-msg"></div>
         <div class="auth-divider">or</div>
         <button class="auth-forgot" onclick="AUTH.switchTab('signin')" style="margin-top:4px;align-self:center">← Back to Sign In</button>
       </div>
-
     </div>
 
-    <!-- Footer -->
     <div class="auth-footer">
       Secured by <a href="https://supabase.com" target="_blank">Supabase Auth</a> ·
       Session persists automatically ·
       <a href="https://supabase.com/docs/guides/auth" target="_blank">Auth Docs</a>
     </div>
-
   </div>
 </div>
 
-<!-- Toast container -->
 <div class="toast" id="toast-container"></div>
 
 <script>
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  SUPABASE — CONFIGURE ONCE HERE. NOTHING ELSE NEEDS CHANGING.  ║
-// ╠══════════════════════════════════════════════════════════════════╣
-// ║  1. Go to https://supabase.com → your project → Settings →     ║
-// ║     API and copy your Project URL and anon public key.          ║
-// ║  2. Paste them below. The rest of the app uses window.SB only.  ║
-// ╚══════════════════════════════════════════════════════════════════╝
-const SUPABASE_URL  = 'https://ibpxmwowrviueeubiavc.supabase.co';   // ← PASTE YOUR URL
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicHhtd293cnZpdWVldWJpYXZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTc1NTAsImV4cCI6MjA5NDE5MzU1MH0.Mwamj7enFCzdQO2uU9whk8r9K6NTdp8wlmUohcXh26o';                  // ← PASTE YOUR ANON KEY
+// ══════════════════════════════════════════════════════
+//  SUPABASE CONFIG
+// ══════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ibpxmwowrviueeubiavc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlicHhtd293cnZpdWVldWJpYXZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2MTc1NTAsImV4cCI6MjA5NDE5MzU1MH0.Mwamj7enFCzdQO2uU9whk8r9K6NTdp8wlmUohcXh26o';
 
-// ── Single client instance — auth + realtime + db in one ────────────
 const SB = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession:    true,       // token survives page refresh
-    autoRefreshToken:  true,       // silently renews before expiry
-    detectSessionInUrl:true,       // handles magic link / OAuth redirects
-    storage:           localStorage,
-  },
+  auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storage:localStorage },
   realtime: { params: { eventsPerSecond: 10 } },
 });
-// ────────────────────────────────────────────────────────────────────
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  AUTH — all Supabase authentication via this single object      ║
-// ║  SB.auth.onAuthStateChange() is the ONE listener that drives    ║
-// ║  the entire app — login → dashboard → logout → login screen     ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════════
 const AUTH = {
-
   currentUser: null,
   _activeTab: 'signin',
+  _dashLoaded: false,
 
-  // ── Initialise: called ONCE in bootstrap ───────────────────────
-  // Sets up the single auth state listener. Supabase fires it
-  // immediately with the existing session (if any), so we never
-  // need to call getSession() manually.
   init() {
-    // Guard: if credentials are placeholders, skip auth entirely
     if (SUPABASE_URL.includes('YOUR_PROJECT_ID') || SUPABASE_KEY.includes('YOUR_ANON')) {
-      AUTH._enterDemoMode();
-      return;
+      AUTH._enterDemoMode(); return;
     }
-
-    // ── THE ONE AUTH STATE LISTENER ─────────────────────────────
     SB.auth.onAuthStateChange((event, session) => {
       AUTH.currentUser = session?.user ?? null;
-
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        if (AUTH.currentUser) {
-          AUTH._onSignedIn(session.user);
-        } else {
-          AUTH._onSignedOut();
-        }
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') && AUTH.currentUser) {
+        AUTH._onSignedIn(session.user);
       }
-
-      if (event === 'SIGNED_OUT') {
-        AUTH._onSignedOut();
-      }
-
-      if (event === 'PASSWORD_RECOVERY') {
-        AUTH.switchTab('reset');
-      }
+      if (event === 'SIGNED_OUT') AUTH._onSignedOut();
+      if (event === 'PASSWORD_RECOVERY') AUTH.switchTab('reset');
     });
   },
 
-  // ── Called when a valid session is present ─────────────────────
   _onSignedIn(user) {
-    // Hide login overlay
     document.getElementById('auth-overlay').classList.add('hidden');
-
-    // Show user pill + logout btn
     const initials = (user.email||'?').slice(0,2).toUpperCase();
-    document.getElementById('user-avatar').textContent      = initials;
+    document.getElementById('user-avatar').textContent = initials;
     document.getElementById('user-email-display').textContent = user.email || '—';
-    document.getElementById('user-pill').style.display     = 'flex';
-    document.getElementById('logout-btn').style.display    = 'flex';
-
-    // Boot the dashboard if not already loaded
-    if (!AUTH._dashLoaded) {
-      AUTH._dashLoaded = true;
-      BOOT_DASHBOARD();
-    }
+    document.getElementById('user-pill').style.display = 'flex';
+    document.getElementById('logout-btn').style.display = 'flex';
+    if (!AUTH._dashLoaded) { AUTH._dashLoaded = true; BOOT_DASHBOARD(); }
   },
 
-  // ── Called when no session / after sign-out ────────────────────
   _onSignedOut() {
-    AUTH.currentUser  = null;
-    AUTH._dashLoaded  = false;
+    AUTH.currentUser = null; AUTH._dashLoaded = false;
     document.getElementById('auth-overlay').classList.remove('hidden');
-    document.getElementById('user-pill').style.display  = 'none';
+    document.getElementById('user-pill').style.display = 'none';
     document.getElementById('logout-btn').style.display = 'none';
     toast('Signed out', 'info');
   },
 
-  // ── Demo mode (no credentials configured) ─────────────────────
   _enterDemoMode() {
     AUTH._dashLoaded = true;
     document.getElementById('auth-overlay').classList.add('hidden');
     BOOT_DASHBOARD();
   },
 
-  // ── Sign In ────────────────────────────────────────────────────
   async signIn() {
-    const email    = document.getElementById('si-email').value.trim();
+    const email = document.getElementById('si-email').value.trim();
     const password = document.getElementById('si-password').value;
     if (!email || !password) { AUTH._msg('si-msg','error','Email and password are required.'); return; }
-
     AUTH._setLoading('signin-btn', true);
     AUTH._msg('si-msg','','');
-
     const { error } = await SB.auth.signInWithPassword({ email, password });
-
     AUTH._setLoading('signin-btn', false);
-    if (error) {
-      AUTH._msg('si-msg','error', error.message || 'Sign-in failed. Check your credentials.');
-    }
-    // on success, onAuthStateChange fires automatically — no manual redirect needed
+    if (error) AUTH._msg('si-msg','error', error.message || 'Sign-in failed.');
   },
 
-  // ── Sign Up ────────────────────────────────────────────────────
   async signUp() {
-    const email   = document.getElementById('su-email').value.trim();
-    const pw      = document.getElementById('su-password').value;
+    const email = document.getElementById('su-email').value.trim();
+    const pw = document.getElementById('su-password').value;
     const confirm = document.getElementById('su-confirm').value;
-    if (!email || !pw)        { AUTH._msg('su-msg','error','Email and password are required.'); return; }
-    if (pw.length < 8)        { AUTH._msg('su-msg','error','Password must be at least 8 characters.'); return; }
-    if (pw !== confirm)       { AUTH._msg('su-msg','error','Passwords do not match.'); return; }
-
+    if (!email || !pw) { AUTH._msg('su-msg','error','Email and password are required.'); return; }
+    if (pw.length < 8) { AUTH._msg('su-msg','error','Password must be at least 8 characters.'); return; }
+    if (pw !== confirm) { AUTH._msg('su-msg','error','Passwords do not match.'); return; }
     AUTH._setLoading('signup-btn', true);
     AUTH._msg('su-msg','','');
-
     const { error } = await SB.auth.signUp({ email, password:pw });
-
     AUTH._setLoading('signup-btn', false);
-    if (error) {
-      AUTH._msg('su-msg','error', error.message || 'Sign-up failed.');
-    } else {
+    if (error) { AUTH._msg('su-msg','error', error.message || 'Sign-up failed.'); }
+    else {
       AUTH._msg('su-msg','success','Account created! Check your email to confirm, then sign in.');
       document.getElementById('su-email').value = '';
       document.getElementById('su-password').value = '';
@@ -1061,13 +831,8 @@ const AUTH = {
     }
   },
 
-  // ── Sign Out ───────────────────────────────────────────────────
-  async signOut() {
-    await SB.auth.signOut();
-    // onAuthStateChange SIGNED_OUT fires → _onSignedOut() runs automatically
-  },
+  async signOut() { await SB.auth.signOut(); },
 
-  // ── Password Reset ─────────────────────────────────────────────
   forgotPassword() {
     const si = document.getElementById('si-email').value.trim();
     if (si) document.getElementById('rp-email').value = si;
@@ -1079,18 +844,13 @@ const AUTH = {
   async sendReset() {
     const email = document.getElementById('rp-email').value.trim();
     if (!email) { AUTH._msg('rp-msg','error','Enter your email address.'); return; }
-
     AUTH._setLoading('reset-btn', true);
-    const { error } = await SB.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.href,
-    });
+    const { error } = await SB.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
     AUTH._setLoading('reset-btn', false);
-
-    if (error) { AUTH._msg('rp-msg','error', error.message); }
-    else        { AUTH._msg('rp-msg','success','Reset link sent! Check your inbox.'); }
+    if (error) AUTH._msg('rp-msg','error', error.message);
+    else AUTH._msg('rp-msg','success','Reset link sent! Check your inbox.');
   },
 
-  // ── Tab switcher ───────────────────────────────────────────────
   switchTab(tab) {
     AUTH._activeTab = tab;
     document.getElementById('tab-signin').classList.toggle('active', tab==='signin');
@@ -1098,13 +858,11 @@ const AUTH = {
     AUTH._showForm(tab==='signin' ? 'form-signin' : 'form-signup');
   },
 
-  // ── User menu (simple toast for now) ──────────────────────────
   showUserMenu() {
     const u = AUTH.currentUser;
-    if (u) toast(`Signed in as ${u.email}`, 'info');
+    if (u) toast('Signed in as ' + u.email, 'info');
   },
 
-  // ── Password visibility toggle ─────────────────────────────────
   togglePwd(inputId, btn) {
     const inp = document.getElementById(inputId);
     const show = inp.type === 'password';
@@ -1112,7 +870,6 @@ const AUTH = {
     btn.querySelector('i').className = show ? 'ti ti-eye-off' : 'ti ti-eye';
   },
 
-  // ── Helpers ────────────────────────────────────────────────────
   _showForm(id) {
     ['form-signin','form-signup','form-reset'].forEach(f => {
       document.getElementById(f).style.display = f===id ? 'block' : 'none';
@@ -1130,55 +887,39 @@ const AUTH = {
     const el = document.getElementById(id);
     if (!el) return;
     el.textContent = text;
-    el.className = `auth-msg${type&&text?' '+type+' visible':''}`;
+    el.className = 'auth-msg' + (type && text ? ' '+type+' visible' : '');
   },
-
-  _dashLoaded: false,
 };
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  FALLBACK DATA — used when Supabase table is empty or offline   ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  FALLBACK DATA
+// ══════════════════════════════════════════════════════
 const FALLBACK = {
   rules: [
-
-    // ═══════════════════════════════════════════════════════════════
-    // SYSTEM 1 — BEARISH → BULLISH SHIFT  (CHoCH / MSS Bullish)
-    // ═══════════════════════════════════════════════════════════════
-    { id:'s1r1',  text:'[SYS 1 · STRUCTURE] In a downtrend: identify the specific Lower High (LH) that was directly responsible for creating the most recent Lower Low (LL). This LH is the key level to watch for a shift.', tag:'choch', enabled:true },
-    { id:'s1r2',  text:'[SYS 1 · BREAK] Price must break AND close ABOVE that LH with strong momentum — minimum 3 consecutive candles closing above the LH level. A single candle close does NOT qualify.', tag:'choch', enabled:true },
-    { id:'s1r3',  text:'[SYS 1 · MTF CONFIRM] The LH break must be confirmed across ALL 4 timeframes: 1M body closes above LH → 5M body closes above → 15M body closes above → 1H body closes above. All 4 must agree.', tag:'mtf',   enabled:true },
-    { id:'s1r4',  text:'[SYS 1 · ANTI-FAKEOUT] Reject setup if: break is driven by a single spike/wick, or closes back below LH within 2 candles on ANY timeframe, or 1H has not yet confirmed. Wait — do not chase.', tag:'filter', enabled:true },
-    { id:'s1r5',  text:'[SYS 1 · WAIT] After confirmed break: do NOT enter immediately. Wait for price to retrace back to the Fibonacci 0.50–0.618 zone measured from the last LL to the breakout high.', tag:'entry',  enabled:true },
-    { id:'s1r6',  text:'[SYS 1 · CONFIRMATION] Inside the 0.50–0.618 Fib zone: wait for price to show RESISTANCE — a rejection candle (pin bar, engulfing, doji with follow-through) confirming buyers are defending the zone.', tag:'entry',  enabled:true },
-    { id:'s1r7',  text:'[SYS 1 · EXECUTE] Enter BUY on confirmation candle close inside Fib zone. SL: below the retracement low (below 0.618 level + small buffer). TP: 3R from entry (3× the SL distance above entry).', tag:'risk',   enabled:true },
-    { id:'s1r8',  text:'[SYS 1 · RISK] Position size calculated so that SL distance = max 1.5% account risk. TP is fixed at 3R. Partial take at 1.5R (50% position), trail SL to breakeven, let remainder run to 3R.', tag:'risk',   enabled:true },
-
-    // ═══════════════════════════════════════════════════════════════
-    // SYSTEM 2 — BULLISH → BEARISH SHIFT  (CHoCH / MSS Bearish)
-    // ═══════════════════════════════════════════════════════════════
-    { id:'s2r1',  text:'[SYS 2 · STRUCTURE] In an uptrend: identify the specific Higher Low (HL) that was directly responsible for creating the most recent Higher High (HH). This HL is the key level for a bearish shift.', tag:'choch', enabled:true },
-    { id:'s2r2',  text:'[SYS 2 · BREAK] Price must break AND close BELOW that HL with strong momentum — minimum 3 consecutive candles closing below the HL level. A wick break or single candle is invalid.', tag:'choch', enabled:true },
-    { id:'s2r3',  text:'[SYS 2 · MTF CONFIRM] Bearish break confirmed across ALL 4 TFs: 1M body closes below HL → 5M body closes below → 15M body closes below → 1H body closes below. Every TF must agree.', tag:'mtf',   enabled:true },
-    { id:'s2r4',  text:'[SYS 2 · ANTI-FAKEOUT] Reject if: break is a single wick or news spike, price recovers back above HL within 2 candles on ANY timeframe, or 1H has not yet confirmed the close below HL.', tag:'filter', enabled:true },
-    { id:'s2r5',  text:'[SYS 2 · WAIT] After confirmed break: wait for retracement UP to Fibonacci 0.50–0.618 zone measured from the last HH down to the breakdown low.', tag:'entry',  enabled:true },
-    { id:'s2r6',  text:'[SYS 2 · CONFIRMATION] Inside 0.50–0.618 zone: wait for price to show RESISTANCE — a rejection candle confirming sellers are defending the zone (bearish engulfing, shooting star, or bearish pin bar).', tag:'entry',  enabled:true },
-    { id:'s2r7',  text:'[SYS 2 · EXECUTE] Enter SELL on confirmation candle close inside Fib zone. SL: above the retracement high (above 0.618 level + buffer). TP: 3R from entry (3× the SL distance below entry).', tag:'risk',   enabled:true },
-    { id:'s2r8',  text:'[SYS 2 · RISK] Same money management: 1.5% max risk per trade. Partial close 50% at 1.5R, move SL to breakeven, hold remainder to 3R target.', tag:'risk',   enabled:true },
-
-    // ═══════════════════════════════════════════════════════════════
-    // SYSTEM 3 — TREND CONTINUATION  (Break of Swing Point)
-    // ═══════════════════════════════════════════════════════════════
-    { id:'s3r1',  text:'[SYS 3 · TREND] Prerequisite: price must be in a clearly defined trend (HH+HL sequence = bullish trend / LH+LL sequence = bearish trend) on the 1H timeframe. Do NOT use this system in ranging conditions.', tag:'trend',  enabled:true },
-    { id:'s3r2',  text:'[SYS 3 · BREAK BULL] In a bullish trend: every time price breaks above a swing high (previous HH), confirm momentum across 1M + 5M + 15M + 1H — at least 3 candles closing above on each TF before considering entry.', tag:'trend',  enabled:true },
-    { id:'s3r3',  text:'[SYS 3 · BREAK BEAR] In a bearish trend: every time price breaks below a swing low (previous LL), confirm momentum across 1M + 5M + 15M + 1H — at least 3 candles closing below on each TF.', tag:'trend',  enabled:true },
-    { id:'s3r4',  text:'[SYS 3 · WAIT] After confirmed swing break: do NOT enter immediately. Wait for price to retrace to the Fibonacci 0.50–0.618 zone of the swing move (from breakout origin to breakout high/low).', tag:'entry',  enabled:true },
-    { id:'s3r5',  text:'[SYS 3 · CONFIRMATION] Price must show clear resistance at the 0.50–0.618 zone before entry — rejection candle or engulfing pattern required. No candle confirmation = no trade, keep waiting or skip.', tag:'entry',  enabled:true },
-    { id:'s3r6',  text:'[SYS 3 · EXECUTE BULL] BUY entry on confirmation inside Fib zone. SL: below the 0.618 Fib level or below the nearest swing low. TP: 3R. Partial exit 50% at 1.5R, trail SL to BE, hold rest to 3R.', tag:'risk',   enabled:true },
-    { id:'s3r7',  text:'[SYS 3 · EXECUTE BEAR] SELL entry on confirmation inside Fib zone. SL: above 0.618 Fib level or above nearest swing high. TP: 3R. Same partial exit and trail logic applies.', tag:'risk',   enabled:true },
-    { id:'s3r8',  text:'[SYS 3 · RISK] Max 1.5% account risk per trade. Maximum 3 simultaneous trend-continuation trades. If retracement exceeds 0.618 without confirmation, skip — the move may be reversing.', tag:'risk',   enabled:true },
-
+    { id:'s1r1', text:'[SYS 1 · STRUCTURE] In a downtrend: identify the specific Lower High (LH) that was directly responsible for creating the most recent Lower Low (LL). This LH is the key level to watch for a shift.', tag:'choch', enabled:true },
+    { id:'s1r2', text:'[SYS 1 · BREAK] Price must break AND close ABOVE that LH with strong momentum — minimum 3 consecutive candles closing above the LH level. A single candle close does NOT qualify.', tag:'choch', enabled:true },
+    { id:'s1r3', text:'[SYS 1 · MTF CONFIRM] The LH break must be confirmed across ALL 4 timeframes: 1M body closes above LH → 5M body closes above → 15M body closes above → 1H body closes above. All 4 must agree.', tag:'mtf', enabled:true },
+    { id:'s1r4', text:'[SYS 1 · ANTI-FAKEOUT] Reject setup if: break is driven by a single spike/wick, or closes back below LH within 2 candles on ANY timeframe, or 1H has not yet confirmed. Wait — do not chase.', tag:'filter', enabled:true },
+    { id:'s1r5', text:'[SYS 1 · WAIT] After confirmed break: do NOT enter immediately. Wait for price to retrace back to the Fibonacci 0.50–0.618 zone measured from the last LL to the breakout high.', tag:'entry', enabled:true },
+    { id:'s1r6', text:'[SYS 1 · CONFIRMATION] Inside the 0.50–0.618 Fib zone: wait for price to show RESISTANCE — a rejection candle (pin bar, engulfing, doji with follow-through) confirming buyers are defending the zone.', tag:'entry', enabled:true },
+    { id:'s1r7', text:'[SYS 1 · EXECUTE] Enter BUY on confirmation candle close inside Fib zone. SL: below the retracement low (below 0.618 level + small buffer). TP: 3R from entry (3x the SL distance above entry).', tag:'risk', enabled:true },
+    { id:'s1r8', text:'[SYS 1 · RISK] Position size calculated so that SL distance = max 1.5% account risk. TP is fixed at 3R. Partial take at 1.5R (50% position), trail SL to breakeven, let remainder run to 3R.', tag:'risk', enabled:true },
+    { id:'s2r1', text:'[SYS 2 · STRUCTURE] In an uptrend: identify the specific Higher Low (HL) that was directly responsible for creating the most recent Higher High (HH). This HL is the key level for a bearish shift.', tag:'choch', enabled:true },
+    { id:'s2r2', text:'[SYS 2 · BREAK] Price must break AND close BELOW that HL with strong momentum — minimum 3 consecutive candles closing below the HL level. A wick break or single candle is invalid.', tag:'choch', enabled:true },
+    { id:'s2r3', text:'[SYS 2 · MTF CONFIRM] Bearish break confirmed across ALL 4 TFs: 1M body closes below HL → 5M body closes below → 15M body closes below → 1H body closes below. Every TF must agree.', tag:'mtf', enabled:true },
+    { id:'s2r4', text:'[SYS 2 · ANTI-FAKEOUT] Reject if: break is a single wick or news spike, price recovers back above HL within 2 candles on ANY timeframe, or 1H has not yet confirmed the close below HL.', tag:'filter', enabled:true },
+    { id:'s2r5', text:'[SYS 2 · WAIT] After confirmed break: wait for retracement UP to Fibonacci 0.50–0.618 zone measured from the last HH down to the breakdown low.', tag:'entry', enabled:true },
+    { id:'s2r6', text:'[SYS 2 · CONFIRMATION] Inside 0.50–0.618 zone: wait for price to show RESISTANCE — a rejection candle confirming sellers are defending the zone (bearish engulfing, shooting star, or bearish pin bar).', tag:'entry', enabled:true },
+    { id:'s2r7', text:'[SYS 2 · EXECUTE] Enter SELL on confirmation candle close inside Fib zone. SL: above the retracement high (above 0.618 level + buffer). TP: 3R from entry (3x the SL distance below entry).', tag:'risk', enabled:true },
+    { id:'s2r8', text:'[SYS 2 · RISK] Same money management: 1.5% max risk per trade. Partial close 50% at 1.5R, move SL to breakeven, hold remainder to 3R target.', tag:'risk', enabled:true },
+    { id:'s3r1', text:'[SYS 3 · TREND] Prerequisite: price must be in a clearly defined trend (HH+HL sequence = bullish trend / LH+LL sequence = bearish trend) on the 1H timeframe. Do NOT use this system in ranging conditions.', tag:'trend', enabled:true },
+    { id:'s3r2', text:'[SYS 3 · BREAK BULL] In a bullish trend: every time price breaks above a swing high (previous HH), confirm momentum across 1M + 5M + 15M + 1H — at least 3 candles closing above on each TF before considering entry.', tag:'trend', enabled:true },
+    { id:'s3r3', text:'[SYS 3 · BREAK BEAR] In a bearish trend: every time price breaks below a swing low (previous LL), confirm momentum across 1M + 5M + 15M + 1H — at least 3 candles closing below on each TF.', tag:'trend', enabled:true },
+    { id:'s3r4', text:'[SYS 3 · WAIT] After confirmed swing break: do NOT enter immediately. Wait for price to retrace to the Fibonacci 0.50–0.618 zone of the swing move (from breakout origin to breakout high/low).', tag:'entry', enabled:true },
+    { id:'s3r5', text:'[SYS 3 · CONFIRMATION] Price must show clear resistance at the 0.50–0.618 zone before entry — rejection candle or engulfing pattern required. No candle confirmation = no trade, keep waiting or skip.', tag:'entry', enabled:true },
+    { id:'s3r6', text:'[SYS 3 · EXECUTE BULL] BUY entry on confirmation inside Fib zone. SL: below the 0.618 Fib level or below the nearest swing low. TP: 3R. Partial exit 50% at 1.5R, trail SL to BE, hold rest to 3R.', tag:'risk', enabled:true },
+    { id:'s3r7', text:'[SYS 3 · EXECUTE BEAR] SELL entry on confirmation inside Fib zone. SL: above 0.618 Fib level or above nearest swing high. TP: 3R. Same partial exit and trail logic applies.', tag:'risk', enabled:true },
+    { id:'s3r8', text:'[SYS 3 · RISK] Max 1.5% account risk per trade. Maximum 3 simultaneous trend-continuation trades. If retracement exceeds 0.618 without confirmation, skip — the move may be reversing.', tag:'risk', enabled:true },
   ],
   trades: [
     { id:'t1', symbol:'EURUSD', direction:'BUY',  lots:'0.20', open_price:'1.08310', pnl:'+$28.40'  },
@@ -1196,39 +937,35 @@ const FALLBACK = {
     { id:'p2', name:'Bullish Market Structure Shift', symbol:'EURUSD · 15M', confidence:'89%', direction:'bull', detected_at:'14:28', sub:'Break of last LH · strong bull displacement' },
     { id:'p3', name:'Fair Value Gap (Bullish)',        symbol:'XAUUSD · 5M',  confidence:'87%', direction:'bull', detected_at:'14:15', sub:'FVG formed after displacement · entry zone active' },
     { id:'p4', name:'Buy-Side Liquidity Sweep',       symbol:'GBPUSD · 15M', confidence:'80%', direction:'liq',  detected_at:'13:20', sub:'Equal highs swept → bearish displacement' },
-    { id:'p5', name:'⚡ BLOCKED: No Displacement',    symbol:'USDJPY · 15M', confidence:'—',   direction:'block', detected_at:'12:30', sub:'MSS was wick only — filter rule applied, no trade' },
+    { id:'p5', name:'BLOCKED: No Displacement',       symbol:'USDJPY · 15M', confidence:'—',   direction:'block', detected_at:'12:30', sub:'MSS was wick only — filter rule applied, no trade' },
   ],
 };
 
 const FILTERS = [
-  // ── False Breakout Guards ──
-  '🚫 FAKEOUT: Break is a single candle or wick only — need 3+ body closes above/below the level',
-  '🚫 FAKEOUT: Price closes back through the broken level within 2 candles on ANY timeframe — invalid, skip',
-  '🚫 FAKEOUT: 1H has NOT yet confirmed the break — lower TFs mean nothing without 1H close',
-  '🚫 FAKEOUT: Break happened during a news spike only — no sustained momentum, wait for retest',
-  '🚫 FAKEOUT: 1M and 5M confirm but 15M and 1H are against the direction — MTF misalignment, skip',
-  // ── Retracement Quality Guards ──
-  '🚫 ENTRY: Price retraced deeper than 0.618 Fib without showing rejection — structure may be breaking down',
-  '🚫 ENTRY: No rejection candle in the 0.50–0.618 zone — do not enter on pure price location alone',
-  '🚫 ENTRY: Fib zone is overlapping a major news event in next 30 min — skip or wait until after',
-  // ── Structure Guards ──
-  '🚫 STRUCTURE: Market is ranging on 1H — Systems 1, 2, 3 require a clear trend. Wait for structure.',
-  '🚫 STRUCTURE: LH/HL identified is not the one responsible for the most recent LL/HH — wrong pivot',
-  // ── Risk Guards ──
-  '🚫 RISK: Daily loss limit reached — all entries blocked for the rest of the session',
-  '🚫 RISK: More than 3 simultaneous open trades — no new entries until a position is closed',
+  'FAKEOUT: Break is a single candle or wick only — need 3+ body closes above/below the level',
+  'FAKEOUT: Price closes back through the broken level within 2 candles on ANY timeframe — invalid, skip',
+  'FAKEOUT: 1H has NOT yet confirmed the break — lower TFs mean nothing without 1H close',
+  'FAKEOUT: Break happened during a news spike only — no sustained momentum, wait for retest',
+  'FAKEOUT: 1M and 5M confirm but 15M and 1H are against the direction — MTF misalignment, skip',
+  'ENTRY: Price retraced deeper than 0.618 Fib without showing rejection — structure may be breaking down',
+  'ENTRY: No rejection candle in the 0.50–0.618 zone — do not enter on pure price location alone',
+  'ENTRY: Fib zone is overlapping a major news event in next 30 min — skip or wait until after',
+  'STRUCTURE: Market is ranging on 1H — Systems 1, 2, 3 require a clear trend. Wait for structure.',
+  'STRUCTURE: LH/HL identified is not the one responsible for the most recent LL/HH — wrong pivot',
+  'RISK: Daily loss limit reached — all entries blocked for the rest of the session',
+  'RISK: More than 3 simultaneous open trades — no new entries until a position is closed',
 ];
 
 const TAG_META = {
-  bias:   { cls:'rule-tag bias',   label:'Bias'    },
-  mss:    { cls:'rule-tag mss',    label:'MSS'     },
-  liq:    { cls:'rule-tag liq',    label:'Liq.'    },
-  entry:  { cls:'rule-tag entry',  label:'Entry'   },
-  risk:   { cls:'rule-tag risk',   label:'Risk'    },
-  choch:  { cls:'rule-tag choch',  label:'CHoCH'   },
-  mtf:    { cls:'rule-tag mtf',    label:'MTF'     },
-  filter: { cls:'rule-tag flt',    label:'Filter'  },
-  trend:  { cls:'rule-tag trend',  label:'Trend'   },
+  bias:   { cls:'rule-tag bias',  label:'Bias'   },
+  mss:    { cls:'rule-tag mss',   label:'MSS'    },
+  liq:    { cls:'rule-tag liq',   label:'Liq.'   },
+  entry:  { cls:'rule-tag entry', label:'Entry'  },
+  risk:   { cls:'rule-tag risk',  label:'Risk'   },
+  choch:  { cls:'rule-tag choch', label:'CHoCH'  },
+  mtf:    { cls:'rule-tag mtf',   label:'MTF'    },
+  filter: { cls:'rule-tag flt',   label:'Filter' },
+  trend:  { cls:'rule-tag trend', label:'Trend'  },
 };
 
 const TAG_MAP = {
@@ -1238,162 +975,233 @@ const TAG_MAP = {
   'Break of Structure (BOS)':'mss','Change of Character (CHOCH)':'mss',
 };
 
-// In-memory cache so renders are instant
 let CACHE = { rules:[], trades:[], executions:[], patterns:[] };
 
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  DB — all Supabase operations go through this object           ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  LIVE TICKER — reads from Supabase market_prices
+// ══════════════════════════════════════════════════════
+let _prevPrices = {};  // track previous mid to show up/down flash
+
+async function loadLivePrices() {
+  const { data, error } = await SB
+    .from('market_prices')
+    .select('symbol,bid,ask,mid,spread,digits,category')
+    .order('symbol');
+
+  if (error || !data || data.length === 0) {
+    document.getElementById('ticker-row').innerHTML =
+      '<div class="ticker-live-dot"></div>' +
+      '<span class="ticker-empty">No prices — start the MT5 bridge to see live data</span>';
+    return;
+  }
+
+  const dot = '<div class="ticker-live-dot"></div>';
+  const items = data.map(t => {
+    const mid    = parseFloat(t.mid || t.bid || 0);
+    const bid    = parseFloat(t.bid || 0);
+    const ask    = parseFloat(t.ask || 0);
+    const dec    = t.digits || (mid > 1000 ? 2 : mid > 100 ? 3 : 5);
+    const prev   = _prevPrices[t.symbol] || mid;
+    const dir    = mid > prev ? 'flash-up' : mid < prev ? 'flash-dn' : '';
+    _prevPrices[t.symbol] = mid;
+
+    return `<div class="ticker-item ${dir}" id="tick-${t.symbol.replace(/[^a-z0-9]/gi,'_')}">
+      <div class="ticker-sym">${t.symbol}</div>
+      <div class="ticker-price">${mid.toFixed(dec)}</div>
+      <div class="ticker-meta">
+        <span class="ticker-bid">B:${bid.toFixed(dec)}</span>
+        <span class="ticker-ask">A:${ask.toFixed(dec)}</span>
+        <span class="ticker-spread">spd:${t.spread || '—'}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ticker-row').innerHTML = dot + items;
+
+  // Remove flash class after 600ms
+  setTimeout(() => {
+    document.querySelectorAll('.ticker-item.flash-up,.ticker-item.flash-dn')
+      .forEach(el => el.classList.remove('flash-up','flash-dn'));
+  }, 600);
+}
+
+function subscribePrices() {
+  SB.channel('rt-prices')
+    .on('postgres_changes', { event:'*', schema:'public', table:'market_prices' },
+      () => loadLivePrices())
+    .subscribe();
+}
+
+// ══════════════════════════════════════════════════════
+//  DB
+// ══════════════════════════════════════════════════════
 const DB = {
 
-  // ── connection test ────────────────────────────────────────────
   async testConnection() {
-    setTableStatus('rules','checking'); setTableStatus('trades','checking');
-    setTableStatus('exec','checking'); setTableStatus('patterns','checking');
-    setTableStatus('analytics','checking');
-    setSbStatus('connecting','Connecting to Supabase…','');
-
-    // Test each table
     const tables = [
-      { key:'rules',    name:'smc_rules',    el:'st-rules'    },
-      { key:'trades',   name:'open_trades',  el:'st-trades'   },
-      { key:'exec',     name:'executions',   el:'st-exec'     },
-      { key:'patterns', name:'smc_patterns', el:'st-patterns' },
-      { key:'analytics',name:'analytics',    el:'st-analytics'},
+      { key:'rules',    name:'smc_rules',      el:'st-rules'    },
+      { key:'trades',   name:'open_trades',    el:'st-trades'   },
+      { key:'exec',     name:'executions',     el:'st-exec'     },
+      { key:'patterns', name:'smc_patterns',   el:'st-patterns' },
+      { key:'analytics',name:'analytics',      el:'st-analytics'},
+      { key:'prices',   name:'market_prices',  el:'st-prices'   },
+      { key:'markets',  name:'active_markets', el:'st-markets'  },
     ];
+
+    setSbStatus('connecting','Connecting to Supabase…','');
+    tables.forEach(t => setTableStatus(t.key,'checking'));
 
     let allOk = true;
     for (const t of tables) {
       try {
         const { error } = await SB.from(t.name).select('id').limit(1);
-        if (error) { document.getElementById(t.el).textContent='Missing'; document.getElementById(t.el).className='sb-table-status sb-miss'; allOk=false; }
-        else        { document.getElementById(t.el).textContent='✓ Ready'; document.getElementById(t.el).className='sb-table-status sb-ok'; }
-      } catch(e)  { document.getElementById(t.el).textContent='Error'; document.getElementById(t.el).className='sb-table-status sb-miss'; allOk=false; }
+        if (error) {
+          document.getElementById(t.el).textContent = 'Missing';
+          document.getElementById(t.el).className   = 'sb-table-status sb-miss';
+          allOk = false;
+        } else {
+          document.getElementById(t.el).textContent = 'Ready';
+          document.getElementById(t.el).className   = 'sb-table-status sb-ok';
+        }
+      } catch(e) {
+        document.getElementById(t.el).textContent = 'Error';
+        document.getElementById(t.el).className   = 'sb-table-status sb-miss';
+        allOk = false;
+      }
     }
 
     if (allOk) {
       setSbStatus('connected','Connected — all tables ready', SUPABASE_URL);
-      toast('Supabase connected ✓', 'success');
+      toast('Supabase connected', 'success');
       updateTopBadge(true);
     } else {
-      setSbStatus('disconnected','Some tables missing — run SQL schema','Create tables using the SQL block above');
+      setSbStatus('disconnected','Some tables missing — run SQL schema','Create tables using the full schema SQL');
       toast('Some Supabase tables not found — see Settings','error');
       updateTopBadge(false);
     }
   },
 
-  // ── RULES ──────────────────────────────────────────────────────
   async loadRules() {
     const { data, error } = await SB.from('smc_rules').select('*').order('created_at');
-    if (error || !data || data.length === 0) {
-      CACHE.rules = FALLBACK.rules;
-      toast('smc_rules empty — showing defaults','info');
-    } else {
-      CACHE.rules = data;
-    }
+    CACHE.rules = (error || !data || data.length===0) ? FALLBACK.rules : data;
+    if (error || !data || data.length===0) toast('smc_rules empty — showing defaults','info');
     renderRules();
   },
 
   async toggleRule(id, currentVal) {
     CACHE.rules = CACHE.rules.map(r => r.id===id ? {...r, enabled:!currentVal} : r);
     renderRules();
-    const { error } = await SB.from('smc_rules').update({ enabled: !currentVal }).eq('id', id);
-    if (error) { toast('Could not save rule toggle','error'); }
+    await SB.from('smc_rules').update({ enabled: !currentVal }).eq('id', id);
   },
 
   async deleteRule(id) {
     CACHE.rules = CACHE.rules.filter(r => r.id !== id);
     renderRules();
     const { error } = await SB.from('smc_rules').delete().eq('id', id);
-    if (error) { toast('Could not delete rule','error'); }
-    else        { toast('Rule deleted','info'); }
+    if (error) toast('Could not delete rule','error');
+    else toast('Rule deleted','info');
   },
 
   async addRule() {
-    const text = `${document.getElementById('f-indicator').value} ${document.getElementById('f-cond').value} ${document.getElementById('f-value').value||'—'}`;
+    const text = document.getElementById('f-indicator').value + ' ' +
+                 document.getElementById('f-cond').value + ' ' +
+                 (document.getElementById('f-value').value || '—');
     const tag  = TAG_MAP[document.getElementById('f-indicator').value] || 'entry';
-    const newRule = { text, tag, enabled:true };
-
-    const { data, error } = await SB.from('smc_rules').insert([newRule]).select().single();
+    const { data, error } = await SB.from('smc_rules').insert([{ text, tag, enabled:true }]).select().single();
     if (error) {
-      // Optimistic local add with temp id
-      CACHE.rules.push({ id:'local-'+Date.now(), ...newRule });
+      CACHE.rules.push({ id:'local-'+Date.now(), text, tag, enabled:true });
       toast('Rule saved locally (DB error)','error');
     } else {
       CACHE.rules.push(data);
-      toast('Rule added to Supabase ✓','success');
+      toast('Rule added to Supabase','success');
     }
     renderRules();
     document.getElementById('f-value').value = '';
   },
 
-  // ── TRADES ─────────────────────────────────────────────────────
   async loadTrades() {
     const { data, error } = await SB.from('open_trades').select('*').order('created_at', { ascending:false });
-    if (error || !data || data.length === 0) {
-      CACHE.trades = FALLBACK.trades;
-    } else {
-      CACHE.trades = data;
-    }
-    renderOpenTrades();
-    updateMonitorStats();
+    CACHE.trades = (error || !data || data.length===0) ? FALLBACK.trades : data;
+    renderOpenTrades(); updateMonitorStats();
   },
 
   async closeAllTrades() {
     if (!confirm('Close all open trades? This will delete them from Supabase.')) return;
     const { error } = await SB.from('open_trades').delete().neq('id','00000000-0000-0000-0000-000000000000');
-    if (error) { toast('Could not close trades','error'); }
+    if (error) toast('Could not close trades','error');
     else { CACHE.trades=[]; renderOpenTrades(); toast('All trades closed','success'); }
   },
 
-  // ── EXECUTIONS ─────────────────────────────────────────────────
   async loadExecutions() {
     const { data, error } = await SB.from('executions').select('*').order('created_at', { ascending:false }).limit(20);
-    if (error || !data || data.length === 0) {
-      CACHE.executions = FALLBACK.executions;
-    } else {
-      CACHE.executions = data;
-    }
+    CACHE.executions = (error || !data || data.length===0) ? FALLBACK.executions : data;
     renderExec();
   },
 
-  // ── PATTERNS ───────────────────────────────────────────────────
   async loadPatterns() {
     const { data, error } = await SB.from('smc_patterns').select('*').order('created_at', { ascending:false }).limit(30);
-    if (error || !data || data.length === 0) {
-      CACHE.patterns = FALLBACK.patterns;
-    } else {
-      CACHE.patterns = data;
-    }
-    renderPatterns();
-    updatePatternStats();
+    CACHE.patterns = (error || !data || data.length===0) ? FALLBACK.patterns : data;
+    renderPatterns(); updatePatternStats();
   },
 
-  // ── REALTIME SUBSCRIPTIONS (all via the single SB client) ──────
+  async loadActiveMarkets() {
+    const { data, error } = await SB.from('active_markets').select('*').order('category').order('symbol');
+    const el = document.getElementById('market-chips');
+    const mc = document.getElementById('market-count');
+
+    if (error || !data || data.length===0) {
+      el.innerHTML = '<span style="font-size:11px;color:var(--text3);font-family:var(--mono)">No markets found — start the MT5 bridge</span>';
+      if (mc) mc.textContent = '0 Markets';
+      return;
+    }
+
+    // Group by category
+    const groups = {};
+    data.forEach(m => {
+      if (!groups[m.category]) groups[m.category] = [];
+      groups[m.category].push(m);
+    });
+
+    let html = '';
+    for (const [cat, symbols] of Object.entries(groups)) {
+      html += `<div style="width:100%;font-size:9px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;margin-top:8px;margin-bottom:4px">${cat}</div>`;
+      html += symbols.map(m =>
+        `<span class="chip ${m.enabled ? 'active' : ''}"
+          onclick="DB.toggleMarket('${m.id}', ${m.enabled}, this)">${m.symbol}</span>`
+      ).join('');
+    }
+
+    el.innerHTML = html;
+    if (mc) mc.textContent = data.length + ' Markets';
+  },
+
+  async toggleMarket(id, currentEnabled, el) {
+    el.classList.toggle('active', !currentEnabled);
+    await SB.from('active_markets').update({ enabled: !currentEnabled }).eq('id', id);
+  },
+
   subscribeAll() {
-    // Trades
     SB.channel('rt-trades')
       .on('postgres_changes', { event:'*', schema:'public', table:'open_trades' }, () => DB.loadTrades())
       .subscribe();
-    // Executions
     SB.channel('rt-exec')
       .on('postgres_changes', { event:'*', schema:'public', table:'executions' }, () => DB.loadExecutions())
       .subscribe();
-    // Patterns
     SB.channel('rt-patterns')
       .on('postgres_changes', { event:'*', schema:'public', table:'smc_patterns' }, () => DB.loadPatterns())
       .subscribe();
-    // Rules
     SB.channel('rt-rules')
       .on('postgres_changes', { event:'*', schema:'public', table:'smc_rules' }, () => DB.loadRules())
+      .subscribe();
+    SB.channel('rt-markets')
+      .on('postgres_changes', { event:'*', schema:'public', table:'active_markets' }, () => DB.loadActiveMarkets())
       .subscribe();
   },
 };
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  RENDER FUNCTIONS                                               ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ══════════════════════════════════════════════════════
 function renderRules() {
   const el = document.getElementById('rule-list');
   if (!CACHE.rules.length) { el.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:12px;padding:10px">No rules found.</div>'; return; }
@@ -1425,7 +1233,6 @@ function renderExec() {
   if (!CACHE.executions.length) { el.innerHTML='<tr><td colspan="8" style="color:var(--text3);text-align:center;padding:18px">No executions</td></tr>'; return; }
   el.innerHTML = CACHE.executions.map(t => {
     const isClosed = (t.status||'').startsWith('Closed');
-    const cls = isClosed ? 'badge-green' : 'badge-blue';
     return `<tr>
       <td style="color:var(--text3)">${t.exec_time||'—'}</td>
       <td style="font-weight:600">${t.symbol}</td>
@@ -1434,7 +1241,7 @@ function renderExec() {
       <td style="color:var(--down)">${t.sl||'—'}</td>
       <td style="color:var(--up)">${t.tp||'—'}</td>
       <td style="color:var(--purple);font-size:11px">${t.signal||'—'}</td>
-      <td><span class="badge ${cls}">${t.status||'—'}</span></td>
+      <td><span class="badge ${isClosed?'badge-green':'badge-blue'}">${t.status||'—'}</span></td>
     </tr>`;
   }).join('');
 }
@@ -1483,21 +1290,13 @@ function renderFilters() {
   ).join('');
 }
 
-function renderMarkets() {
-  const active=['EURUSD','GBPUSD','XAUUSD','US500','USDJPY','USOIL','GER40'];
-  const all=['EURUSD','GBPUSD','USDJPY','EURGBP','AUDUSD','XAUUSD','USOIL','XAGUSD','US500','NAS100','GER40','UK100'];
-  document.getElementById('market-chips').innerHTML = all.map(m =>
-    `<span class="chip${active.includes(m)?' active':''}" onclick="this.classList.toggle('active')">${m}</span>`
-  ).join('');
-}
-
 function renderPerfRules() {
-  const perf=[
-    {label:'SYS 1 · Bearish→Bullish CHoCH + Fib 0.618',  pct:84,color:'#00c97a'},
-    {label:'SYS 2 · Bullish→Bearish CHoCH + Fib 0.5',    pct:79,color:'#00c97a'},
-    {label:'SYS 3 · Trend Cont. · Swing Break + Retrace', pct:76,color:'#00c97a'},
-    {label:'MTF Confirm 1M+5M+15M+1H all aligned',        pct:91,color:'#00c97a'},
-    {label:'3-Candle Momentum Filter (false break guard)', pct:88,color:'#fbbf24'},
+  const perf = [
+    { label:'SYS 1 · Bearish→Bullish CHoCH + Fib 0.618',  pct:84, color:'#00c97a' },
+    { label:'SYS 2 · Bullish→Bearish CHoCH + Fib 0.5',    pct:79, color:'#00c97a' },
+    { label:'SYS 3 · Trend Cont. · Swing Break + Retrace', pct:76, color:'#00c97a' },
+    { label:'MTF Confirm 1M+5M+15M+1H all aligned',        pct:91, color:'#00c97a' },
+    { label:'3-Candle Momentum Filter (false break guard)', pct:88, color:'#fbbf24' },
   ];
   document.getElementById('perf-rules').innerHTML = perf.map(r =>
     `<div class="perf-item">
@@ -1525,25 +1324,22 @@ function renderEquity() {
     <polyline points="${pts}" fill="none" stroke="#00d4aa" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  STATS HELPERS                                                  ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  STATS HELPERS
+// ══════════════════════════════════════════════════════
 function updateMonitorStats() {
   const count = CACHE.trades.length;
   document.getElementById('s-open').textContent = count;
-  document.getElementById('s-open-sub').textContent = `${count} active position${count!==1?'s':''}`;
+  document.getElementById('s-open-sub').textContent = count + ' active position' + (count!==1?'s':'');
   document.getElementById('s-patterns').textContent = CACHE.patterns.length;
-
-  // Compute total PnL from trades (rough sum of positive $ values)
   let pnl = 0;
   CACHE.trades.forEach(t => {
     const m = (t.pnl||'').match(/[+-]?\$?([\d.]+)/);
     if (m) pnl += parseFloat(m[1]) * ((t.pnl||'').startsWith('-') ? -1 : 1);
   });
   const pnlEl = document.getElementById('s-pnl');
-  pnlEl.textContent = (pnl>=0?'+$':'-$')+Math.abs(pnl).toFixed(2);
-  pnlEl.className = 'stat-value '+(pnl>=0?'up':'down');
+  pnlEl.textContent = (pnl>=0?'+$':'-$') + Math.abs(pnl).toFixed(2);
+  pnlEl.className = 'stat-value ' + (pnl>=0?'up':'down');
 }
 
 function updatePatternStats() {
@@ -1555,55 +1351,53 @@ function updatePatternStats() {
   const blocked = CACHE.patterns.filter(p=>p.direction==='block').length;
   if(document.getElementById('ps-liq'))     document.getElementById('ps-liq').textContent=liq;
   if(document.getElementById('ps-mss'))     document.getElementById('ps-mss').textContent=mss;
-  if(document.getElementById('ps-mss-sub'))document.getElementById('ps-mss-sub').textContent=`${bull} bullish · ${bear} bearish`;
+  if(document.getElementById('ps-mss-sub'))document.getElementById('ps-mss-sub').textContent=bull+' bullish · '+bear+' bearish';
   if(document.getElementById('ps-entry'))   document.getElementById('ps-entry').textContent=entries;
   if(document.getElementById('ps-blocked')) document.getElementById('ps-blocked').textContent=blocked;
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  UI HELPERS                                                     ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════════
 function setSbStatus(state, label, sub) {
-  const dot = document.getElementById('sb-dot');
+  const dot   = document.getElementById('sb-dot');
   const badge = document.getElementById('sb-badge');
   dot.className = 'sb-dot ' + state;
   document.getElementById('sb-status-label').textContent = label;
-  document.getElementById('sb-status-sub').textContent = sub || '';
-  if (state==='connected')    { badge.textContent='Connected'; badge.style.cssText='background:rgba(0,201,122,.15);color:#00c97a;border:0.5px solid rgba(0,201,122,.3)'; }
-  else if (state==='disconnected'){ badge.textContent='Error'; badge.style.cssText='background:rgba(255,77,106,.12);color:#ff4d6a;border:0.5px solid rgba(255,77,106,.25)'; }
+  document.getElementById('sb-status-sub').textContent   = sub || '';
+  if (state==='connected')     { badge.textContent='Connected'; badge.style.cssText='background:rgba(0,201,122,.15);color:#00c97a;border:0.5px solid rgba(0,201,122,.3)'; }
+  else if (state==='disconnected') { badge.textContent='Error'; badge.style.cssText='background:rgba(255,77,106,.12);color:#ff4d6a;border:0.5px solid rgba(255,77,106,.25)'; }
   else { badge.textContent='Connecting…'; badge.style.cssText='background:rgba(245,166,35,.12);color:#f5a623;border:0.5px solid rgba(245,166,35,.25)'; }
 }
 
 function setTableStatus(key, state) {
-  const id = { rules:'st-rules', trades:'st-trades', exec:'st-exec', patterns:'st-patterns', analytics:'st-analytics' }[key];
-  const el = document.getElementById(id);
+  const idMap = { rules:'st-rules', trades:'st-trades', exec:'st-exec', patterns:'st-patterns', analytics:'st-analytics', prices:'st-prices', markets:'st-markets' };
+  const el = document.getElementById(idMap[key]);
   if (!el) return;
   el.textContent = state==='checking' ? 'Checking…' : state;
-  el.className = 'sb-table-status';
+  el.className   = 'sb-table-status';
 }
 
 function updateTopBadge(ok) {
   const el = document.getElementById('sb-topbadge');
   el.style.display = '';
-  if (ok) { el.textContent='⬡ Supabase'; el.className='badge badge-green'; }
-  else     { el.textContent='⬡ DB Error'; el.className='badge badge-red'; }
+  if (ok) { el.textContent='Supabase'; el.className='badge badge-green'; }
+  else     { el.textContent='DB Error'; el.className='badge badge-red'; }
 }
 
 function toast(msg, type='info') {
   const c = document.getElementById('toast-container');
   const d = document.createElement('div');
-  d.className = `toast-item ${type}`;
+  d.className = 'toast-item ' + type;
   const icon = type==='success'?'ti-circle-check':type==='error'?'ti-alert-circle':'ti-info-circle';
-  d.innerHTML = `<i class="ti ${icon}" style="font-size:15px;flex-shrink:0"></i>${msg}`;
+  d.innerHTML = '<i class="ti ' + icon + '" style="font-size:15px;flex-shrink:0"></i>' + msg;
   c.appendChild(d);
   setTimeout(() => d.remove(), 3500);
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  TAB / BOT CONTROLS                                             ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  TAB / BOT CONTROLS
+// ══════════════════════════════════════════════════════
 const TAB_TITLES = {
   monitor:  ['Live Monitor',          'SMC Engine · MT5 · Supabase Live'],
   strategy: ['SMC Rules & Strategy',  'Multi-Timeframe Smart Money setup'],
@@ -1611,120 +1405,99 @@ const TAB_TITLES = {
   analytics:['Performance Analytics', '30-day report'],
   settings: ['Settings',             'Connection & configuration'],
 };
+
 function showTab(name) {
   document.querySelectorAll('.tab-page').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
-  const [t,s]=TAB_TITLES[name];
-  document.getElementById('topbar-title').innerHTML=`${t} <span>${s}</span>`;
+  const [t,s] = TAB_TITLES[name];
+  document.getElementById('topbar-title').innerHTML = t + ' <span>' + s + '</span>';
 }
 
 let botRunning = true;
 function toggleBot() {
-  botRunning=!botRunning;
-  document.getElementById('bot-badge').textContent=botRunning?'● Bot Running':'⏸ Bot Paused';
-  document.getElementById('bot-badge').className='badge '+(botRunning?'badge-green':'badge-amber');
-  document.getElementById('bot-btn-text').textContent=botRunning?'Pause':'Resume';
-  document.getElementById('conn-dot').className='conn-dot'+(botRunning?'':' off');
-  document.querySelector('.topbar-btn i').className=`ti ti-${botRunning?'player-pause':'player-play'}`;
+  botRunning = !botRunning;
+  document.getElementById('bot-badge').textContent   = botRunning ? '● Bot Running' : 'Bot Paused';
+  document.getElementById('bot-badge').className     = 'badge ' + (botRunning ? 'badge-green' : 'badge-amber');
+  document.getElementById('bot-btn-text').textContent= botRunning ? 'Pause' : 'Resume';
+  document.getElementById('conn-dot').className      = 'conn-dot' + (botRunning ? '' : ' off');
+  document.querySelector('.topbar-btn i').className  = 'ti ti-' + (botRunning ? 'player-pause' : 'player-play');
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  TICKER (live jitter demo)                                      ║
-// ╚══════════════════════════════════════════════════════════════════╝
-const TICKERS = [
-  {sym:'EURUSD',price:1.08452,chg:+0.12},{sym:'GBPUSD',price:1.26381,chg:-0.08},
-  {sym:'XAUUSD',price:2341.50,chg:+0.54},{sym:'US500',price:5273.20,chg:+0.31},
-  {sym:'USDJPY',price:151.840,chg:-0.22},{sym:'USOIL',price:78.42,chg:+1.14},
-  {sym:'GER40',price:18264.0,chg:+0.19},
-];
-function renderTickers() {
-  document.getElementById('ticker-row').innerHTML = TICKERS.map(t => {
-    const up=t.chg>=0, dec=t.price>1000?2:t.price>100?3:5;
-    return `<div class="ticker-item"><div class="ticker-sym">${t.sym}</div><div class="ticker-price">${t.price.toFixed(dec)}</div><div class="ticker-chg ${up?'chg-up':'chg-dn'}">${up?'+':''}${t.chg.toFixed(2)}%</div></div>`;
-  }).join('');
-}
-function jitter(){
-  if(!botRunning)return;
-  TICKERS.forEach(t=>{const d=(Math.random()-.5)*0.0008*t.price;t.price=Math.round((t.price+d)*100000)/100000;t.chg=Math.round((t.chg+(Math.random()-.5)*0.05)*100)/100;});
-  renderTickers();
-}
-
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  SMC FLOW ANIMATION                                             ║
-// ╚══════════════════════════════════════════════════════════════════╝
-function animateFlow(){
-  if(!botRunning)return;
-  [{id:'flow-retrace',d:4000},{id:'flow-entry',d:7000},{id:'flow-expand',d:10000}].forEach(s=>{
-    const el=document.getElementById(s.id);
-    if(!el)return;
+// ══════════════════════════════════════════════════════
+//  SMC FLOW ANIMATION
+// ══════════════════════════════════════════════════════
+function animateFlow() {
+  if (!botRunning) return;
+  [{id:'flow-retrace',d:4000},{id:'flow-entry',d:7000},{id:'flow-expand',d:10000}].forEach(s => {
+    const el = document.getElementById(s.id);
+    if (!el) return;
     el.classList.remove('lit');
-    setTimeout(()=>el.classList.add('lit'),s.d);
-    setTimeout(()=>el.classList.remove('lit'),s.d+2500);
+    setTimeout(() => el.classList.add('lit'),    s.d);
+    setTimeout(() => el.classList.remove('lit'), s.d + 2500);
   });
 }
-// animation started inside BOOT_DASHBOARD after auth confirms
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  BOOT_DASHBOARD — called by AUTH once session is confirmed      ║
-// ║  All DB and UI setup lives here. Never called before auth.      ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  BOOT DASHBOARD
+// ══════════════════════════════════════════════════════
 async function BOOT_DASHBOARD() {
-  // Static / local renders — instant, no DB needed
-  renderTickers();
   renderEquity();
   renderFilters();
-  renderMarkets();
   renderPerfRules();
-  setInterval(jitter, 2000);
 
-  // No credentials → demo mode, skip DB
+  // Demo mode — no Supabase credentials
   if (SUPABASE_URL.includes('YOUR_PROJECT_ID') || SUPABASE_KEY.includes('YOUR_ANON')) {
     setSbStatus('disconnected',
       'Demo mode — paste Supabase URL & Key in the script to connect',
-      'Find SUPABASE_URL and SUPABASE_KEY at the top of the <script> block');
-    ['rules','trades','exec','patterns','analytics'].forEach(k => setTableStatus(k,'Not configured'));
+      'Find SUPABASE_URL and SUPABASE_KEY at the top of the script block');
+    ['rules','trades','exec','patterns','analytics','prices','markets'].forEach(k => setTableStatus(k,'Not configured'));
     CACHE.rules      = FALLBACK.rules;
     CACHE.trades     = FALLBACK.trades;
     CACHE.executions = FALLBACK.executions;
     CACHE.patterns   = FALLBACK.patterns;
     renderRules(); renderOpenTrades(); renderExec(); renderPatterns();
     updateMonitorStats(); updatePatternStats();
+    // Demo ticker — show placeholder items
+    document.getElementById('ticker-row').innerHTML =
+      '<div class="ticker-live-dot"></div>' +
+      '<span class="ticker-empty">Demo mode — MT5 bridge not connected</span>';
+    document.getElementById('market-chips').innerHTML =
+      '<span style="font-size:11px;color:var(--text3);font-family:var(--mono)">Connect Supabase to load Market Watch</span>';
     toast('Demo mode — using local fallback data', 'info');
-    setInterval(animateFlow, 14000);
-    animateFlow();
+    setInterval(animateFlow, 14000); animateFlow();
     return;
   }
 
-  // Test connection, then load everything in parallel
+  // Live mode
   await DB.testConnection();
   await Promise.all([
     DB.loadRules(),
     DB.loadTrades(),
     DB.loadExecutions(),
     DB.loadPatterns(),
+    DB.loadActiveMarkets(),
+    loadLivePrices(),
   ]);
   updateMonitorStats();
   updatePatternStats();
 
-  // Subscribe to realtime after data is loaded
+  // Subscribe realtime
   DB.subscribeAll();
-  toast('Realtime subscriptions active ✓', 'success');
+  subscribePrices();
+  toast('Realtime subscriptions active', 'success');
 
-  // Start SMC flow animation
+  // Refresh prices every 3 seconds as a fallback poll
+  setInterval(loadLivePrices, 3000);
+
   setInterval(animateFlow, 14000);
   animateFlow();
 }
 
-
-// ╔══════════════════════════════════════════════════════════════════╗
-// ║  PAGE LOAD — only AUTH.init() runs here.                        ║
-// ║  Everything else is triggered by the auth state listener.       ║
-// ╚══════════════════════════════════════════════════════════════════╝
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
 AUTH.init();
 </script>
 </body>
