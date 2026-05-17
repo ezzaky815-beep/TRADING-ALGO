@@ -345,7 +345,12 @@ body::after{content:'';position:fixed;inset:0;background-image:repeating-linear-
           <div class="stat-card"><div class="stat-label">Open Trades</div><div class="stat-value" id="s-open">—</div><div class="stat-sub" id="s-open-sub">Loading…</div></div>
           <div class="stat-card"><div class="stat-label">Today P&amp;L</div><div class="stat-value up" id="s-pnl">—</div><div class="stat-sub">Win rate —%</div></div>
           <div class="stat-card"><div class="stat-label">SMC Setups</div><div class="stat-value" id="s-patterns">—</div><div class="stat-sub">Last 1h</div></div>
-          <div class="stat-card"><div class="stat-label">Bot Uptime</div><div class="stat-value">24h 7m</div><div class="stat-sub">No interruptions</div></div>
+          <!-- ── REAL MT5 BALANCE CARD ── -->
+          <div class="stat-card" style="border-left:2px solid var(--accent);">
+            <div class="stat-label">Account Balance</div>
+            <div class="stat-value" id="s-balance">—</div>
+            <div class="stat-sub" id="s-equity">Equity —</div>
+          </div>
         </div>
 
         <div class="grid-2">
@@ -980,7 +985,7 @@ let CACHE = { rules:[], trades:[], executions:[], patterns:[] };
 // ══════════════════════════════════════════════════════
 //  LIVE TICKER — reads from Supabase market_prices
 // ══════════════════════════════════════════════════════
-let _prevPrices = {};  // track previous mid to show up/down flash
+let _prevPrices = {};
 
 async function loadLivePrices() {
   const { data, error } = await SB
@@ -1018,7 +1023,6 @@ async function loadLivePrices() {
 
   document.getElementById('ticker-row').innerHTML = dot + items;
 
-  // Remove flash class after 600ms
   setTimeout(() => {
     document.querySelectorAll('.ticker-item.flash-up,.ticker-item.flash-dn')
       .forEach(el => el.classList.remove('flash-up','flash-dn'));
@@ -1030,6 +1034,34 @@ function subscribePrices() {
     .on('postgres_changes', { event:'*', schema:'public', table:'market_prices' },
       () => loadLivePrices())
     .subscribe();
+}
+
+// ══════════════════════════════════════════════════════
+//  REAL MT5 BALANCE — reads from equity_snapshots
+// ══════════════════════════════════════════════════════
+async function loadEquity() {
+  const { data, error } = await SB
+    .from('equity_snapshots')
+    .select('balance, equity, floating_pnl')
+    .order('snapped_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error || !data) return;
+
+  const balEl = document.getElementById('s-balance');
+  const eqEl  = document.getElementById('s-equity');
+  if (!balEl) return;
+
+  const bal = parseFloat(data.balance);
+  const eq  = parseFloat(data.equity);
+  const pnl = parseFloat(data.floating_pnl);
+
+  balEl.textContent = '$' + bal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  eqEl.textContent = 'Equity $' + eq.toLocaleString('en-US', { minimumFractionDigits: 2 }) +
+                     ' · Float ' + (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2);
+  eqEl.style.color = pnl >= 0 ? 'var(--up)' : 'var(--down)';
 }
 
 // ══════════════════════════════════════════════════════
@@ -1155,7 +1187,6 @@ const DB = {
       return;
     }
 
-    // Group by category
     const groups = {};
     data.forEach(m => {
       if (!groups[m.category]) groups[m.category] = [];
@@ -1195,6 +1226,11 @@ const DB = {
       .subscribe();
     SB.channel('rt-markets')
       .on('postgres_changes', { event:'*', schema:'public', table:'active_markets' }, () => DB.loadActiveMarkets())
+      .subscribe();
+    // ── Realtime equity balance updates ──
+    SB.channel('rt-equity')
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'equity_snapshots' },
+        () => loadEquity())
       .subscribe();
   },
 };
@@ -1459,7 +1495,6 @@ async function BOOT_DASHBOARD() {
     CACHE.patterns   = FALLBACK.patterns;
     renderRules(); renderOpenTrades(); renderExec(); renderPatterns();
     updateMonitorStats(); updatePatternStats();
-    // Demo ticker — show placeholder items
     document.getElementById('ticker-row').innerHTML =
       '<div class="ticker-live-dot"></div>' +
       '<span class="ticker-empty">Demo mode — MT5 bridge not connected</span>';
@@ -1479,6 +1514,7 @@ async function BOOT_DASHBOARD() {
     DB.loadPatterns(),
     DB.loadActiveMarkets(),
     loadLivePrices(),
+    loadEquity(),          // ← real MT5 balance on boot
   ]);
   updateMonitorStats();
   updatePatternStats();
@@ -1490,6 +1526,9 @@ async function BOOT_DASHBOARD() {
 
   // Refresh prices every 3 seconds as a fallback poll
   setInterval(loadLivePrices, 3000);
+
+  // Refresh balance every 60 seconds as a fallback poll
+  setInterval(loadEquity, 60000);
 
   setInterval(animateFlow, 14000);
   animateFlow();
